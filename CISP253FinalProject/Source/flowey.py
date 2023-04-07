@@ -11,7 +11,7 @@ class flowey:
 
         self.x = x;
         self.y = y;
-        self.brightness = 0
+        self.brightness = 0.0
 
         self.entities = entity_collection()
 
@@ -65,11 +65,11 @@ class flowey:
 
         if self.tick == 1:
             self.set_brightness_all()
-        elif self.tick > 120 and self.tick % 2 == 0 and self.brightness < 1:
-            self.brightness += 0.05
+        elif self.tick > 120 and self.tick % 2 == 0 and self.brightness < 100:
+            self.brightness += 5.0
             self.set_brightness_all()
-        elif self.brightness > 1:
-            self.brightness = 1
+        elif self.brightness > 100:
+            self.brightness = 100
             self.set_brightness_all()
 
     def render(self, screen: Surface) -> None:
@@ -91,7 +91,7 @@ class flowey_piece(entity):
         self.origin_direction = self.direction
         self.origin_image_direction = self.image_direction
 
-    def set_brightness(self, brightness: int) -> None:
+    def set_brightness(self, brightness: float) -> None:
         for item in self.animation.sprites:
             item.set_brightness(brightness)
 
@@ -394,13 +394,7 @@ class eye_socket(flowey_piece):
 
         #Handles the movement of the vines to be natural.
         bobbing_y = sin(self.tick) * 2
-        bobbing_image_dir = sin(self.tick / 5) * (5 if self.origin_x > 300 else -5)
 
         #Allows the owner (Flowey) to affect the x and y positioning of the organs.
         self.x = self.origin_x + self.owner.x# - bobbing_image_dir
         self.y = self.origin_y + self.owner.y + bobbing_y
-        self.image_direction = self.origin_image_direction + bobbing_image_dir
-
-        print(int((self.image_direction - 90) / 2))
-
-        self.animation.set_current(int((self.image_direction - 90) / 2))

@@ -1,4 +1,3 @@
-from PIL import Image, ImageEnhance
 import pygame
 
 #A spritesheet class dedicated to handling more than one image and spliting them up amongst sprites.
@@ -48,9 +47,9 @@ class spritesheet:
         rotator = self.images[0]
 
         for i in range(int(360 / degree_increments) - 1):
-            self.images.append(pygame.transform.rotate(rotator, (i + 1 + start - 90) * degree_increments))
+            self.images.append(pygame.transform.rotate(rotator, (i + 1 + start) * degree_increments))
 
-            if (i + 1 + start - 90) * degree_increments >= end - 90:
+            if (i + 1 + start) * degree_increments >= end:
                 break
 
     #Return a new sprite found at the index of the spritesheet.
@@ -117,9 +116,8 @@ class sprite:
 
         self.image = pygame.transform.smoothscale(self.origin_image, (width * percent, height * percent))
 
-    def set_brightness(self, brightness: int) -> None:
+    def set_brightness(self, brightness: float) -> None:
         pass
-        #self.image = ImageEnhance.Brightness(self.origin_image).enhance(brightness)
     
     #Easy way to get the width of the image.
     def get_width(self) -> int:
@@ -293,8 +291,6 @@ HEAD_ANIMATION = animation(HEAD_SPRITESHEET.get_sprites(), 0)
 
 #EYE SOCKET ANIMATION
 EYE_SOCKET_SPRITESHEET_LEFT = spritesheet(FLOWEY_PATH + "Eyes", "EyeSocketLeft", 1).resize_images(0.5)
-EYE_SOCKET_SPRITESHEET_LEFT.make_rotated_images_range(0.5, -5, 5)
 EYE_SOCKET_SPRITESHEET_RIGHT = spritesheet(FLOWEY_PATH + "Eyes", "EyeSocketRight", 1).resize_images(0.5)
-EYE_SOCKET_SPRITESHEET_RIGHT.make_rotated_images_range(0.5, -5, 5)
 EYE_SOCKET_ANIMATION_LEFT = animation(EYE_SOCKET_SPRITESHEET_LEFT.get_sprites(), 0)
 EYE_SOCKET_ANIMATION_RIGHT = animation(EYE_SOCKET_SPRITESHEET_RIGHT.get_sprites(), 0)
