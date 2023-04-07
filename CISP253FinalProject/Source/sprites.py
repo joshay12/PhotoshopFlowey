@@ -116,8 +116,26 @@ class sprite:
 
         self.image = pygame.transform.smoothscale(self.origin_image, (width * percent, height * percent))
 
-    def set_brightness(self, brightness: float) -> None:
-        pass
+    def set_brightness(self, brightness: int) -> None:
+        new_image = pygame.Surface(self.origin_image.get_size())
+
+        pixels = pygame.PixelArray(self.origin_image)
+        adjusted = pygame.PixelArray(new_image)
+
+        for y in range(new_image.get_height()):
+            for x in range(new_image.get_width()):
+                color = pixels[x, y]
+
+                r = min(max(int(((color >> 16) & 0xFF) + brightness), 0), 255)
+                g = min(max(int(((color >> 8) & 0xFF) + brightness), 0), 255)
+                b = min(max(int((color & 0xFF) + brightness), 0), 255)
+
+                adjusted[x, y] = (r << 16) | (g << 8) | b
+
+        del pixels
+        del adjusted
+
+        self.image = new_image
     
     #Easy way to get the width of the image.
     def get_width(self) -> int:

@@ -65,11 +65,11 @@ class flowey:
 
         if self.tick == 1:
             self.set_brightness_all()
-        elif self.tick > 120 and self.tick % 2 == 0 and self.brightness < 100:
+        elif self.tick > 120 and self.tick % 2 == 0 and self.brightness < 250:
             self.brightness += 5.0
             self.set_brightness_all()
-        elif self.brightness > 100:
-            self.brightness = 100
+        elif self.tick > 120 and self.tick % 2 == 0:
+            self.brightness = 255
             self.set_brightness_all()
 
     def render(self, screen: Surface) -> None:
