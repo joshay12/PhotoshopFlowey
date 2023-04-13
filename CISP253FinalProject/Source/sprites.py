@@ -22,10 +22,10 @@ class spritesheet:
     #Pre-make the rotated images for slower loading times, but faster runtime.
     def make_rotated_images(self, degree_increments: int) -> bool:
         #Do not allow anything more or less than 1 image in the spritesheet.
-        if len(self.images > 1):
+        if len(self.images) > 1:
             print("You cannot have more than 1 image in the spritesheet to make rotated images.")
             return False
-        elif len(self.images == 0):
+        elif len(self.images) == 0:
             print("You cannot have 0 images in the spritesheet to make rotated images.")
             return False
 
@@ -317,3 +317,8 @@ class predef_spritesheets:
         #PUPIL ANIMATION
         self.PUPIL_SPRITESHEET = spritesheet(screen, self.FLOWEY_PATH + "Eyes", "Pupil", 2)
         self.PUPIL_ANIMATION = animation(self.PUPIL_SPRITESHEET.get_sprites(), 0)
+
+        #PIPE ANIMATION
+        self.PIPE_SPRITESHEET = spritesheet(screen, self.FLOWEY_PATH + "Misc", "Pipe", 1)
+        self.PIPE_SPRITESHEET.make_rotated_images(2)
+        self.PIPE_ANIMATION = animation(self.PIPE_SPRITESHEET.get_sprites(), 0)

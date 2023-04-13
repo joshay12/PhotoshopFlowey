@@ -7,12 +7,13 @@ from math import sqrt
 class entity:
     #This constructor requires the animation associated with the entity (even if there is only 1 sprite in it).
     #The x and y are optional to set, but can determine where you'd like the entity to appear on the screen.
-    def __init__(self, animation: animation, x: float = 0.0, y: float = 0.0) -> None:
+    def __init__(self, animation: animation, x: float = 0.0, y: float = 0.0, force_center: bool = False) -> None:
         self.animation = animation
         self.x = x
         self.y = y
         self.layer = 0
-        self.bottom = animation.current.image.get_rect().bottom
+        self.force_center = force_center
+        self.bottom = animation.current.image.get_rect().center if force_center else animation.current.image.get_rect().bottom
         #Set the width and height of the entity to the width and height of the animation's current image.
         self.width = animation.current.get_width()
         self.height = animation.current.get_height()
@@ -58,7 +59,11 @@ class entity:
     def get_data(self) -> Rect:
         #Retrieve the rect from the current animation's image.
         rect = self.animation.current.image.get_rect()
-        rect.bottom = self.bottom
+
+        if self.force_center:
+            rect.center = self.bottom
+        else:
+            rect.bottom = self.bottom
 
         #Parse the x and y of the entity into an integer to pass into the rect.
         rect.x += int(self.x)
