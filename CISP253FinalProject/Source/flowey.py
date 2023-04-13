@@ -55,6 +55,7 @@ class flowey:
         self.entities.add(eye_pupil(self, 248, 177, False))
         self.entities.add(eye_pupil(self, 381, 181, True))
 
+        #Bottom Right Pipes
         temp_x = 310
         temp_y = 220
         temp_dir = 35
@@ -64,6 +65,27 @@ class flowey:
 
             temp_x, temp_y, temp_dir = self.move_in_direction(temp_x, temp_y, 14, 14, temp_dir, 16)
 
+        #Middle Right Pipes
+        temp_x = 350
+        temp_y = 85
+        temp_dir = -20
+
+        for i in range(5):
+            self.entities.add(piping(self, temp_x, temp_y, i, self.current_degree(360 - temp_dir), False))
+
+            temp_x, temp_y, temp_dir = self.move_in_direction(temp_x, temp_y, 14, 14, temp_dir, -8)
+
+        for i in range(6):
+            self.entities.add(piping(self, temp_x, temp_y, i + 6, self.current_degree(360 - temp_dir), False))
+
+            temp_x, temp_y, temp_dir = self.move_in_direction(temp_x, temp_y, 14, 14, temp_dir, -24)
+
+        for i in range(6):
+            self.entities.add(piping(self, temp_x, temp_y, i + 11, self.current_degree(360 - temp_dir), False))
+
+            temp_x, temp_y, temp_dir = self.move_in_direction(temp_x, temp_y, 14, 14, temp_dir, -8)
+
+        #Bottom Left Pipes
         temp_x = 240
         temp_y = 220
         temp_dir = -215
@@ -72,6 +94,26 @@ class flowey:
             self.entities.add(piping(self, temp_x, temp_y, i, self.current_degree(360 - temp_dir), False))
 
             temp_x, temp_y, temp_dir = self.move_in_direction(temp_x, temp_y, 14, 14, temp_dir, -16)
+
+        #Middle Left Pipes
+        temp_x = 200
+        temp_y = 85
+        temp_dir = 200
+
+        for i in range(5):
+            self.entities.add(piping(self, temp_x, temp_y, i, self.current_degree(360 - temp_dir), False))
+
+            temp_x, temp_y, temp_dir = self.move_in_direction(temp_x, temp_y, 14, 14, temp_dir, 8)
+
+        for i in range(6):
+            self.entities.add(piping(self, temp_x, temp_y, i + 6, self.current_degree(360 - temp_dir), False))
+
+            temp_x, temp_y, temp_dir = self.move_in_direction(temp_x, temp_y, 14, 14, temp_dir, 24)
+
+        for i in range(6):
+            self.entities.add(piping(self, temp_x, temp_y, i + 11, self.current_degree(360 - temp_dir), False))
+
+            temp_x, temp_y, temp_dir = self.move_in_direction(temp_x, temp_y, 14, 14, temp_dir, 8)
 
         self.tick = 0
 
