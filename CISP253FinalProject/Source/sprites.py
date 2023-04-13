@@ -1,10 +1,12 @@
 from PIL import Image, ImageEnhance
 import pygame
 
+SPRITESHEETS = None
+
 #A spritesheet class dedicated to handling more than one image and spliting them up amongst sprites.
 class spritesheet:
     #The constructor needs the path of the image(s), the name of the image(s), and the amount of items to loop through.
-    def __init__(self, path: str, name: str, amount: int = 1) -> None:
+    def __init__(self, screen: pygame.Surface, path: str, name: str, amount: int = 1) -> None:
         #Set up the class with its path, name, and amount properties.
         self.path = path
         self.name = name
@@ -15,7 +17,7 @@ class spritesheet:
         #Loop through the amount.
         for i in range(amount):
             #Append the path, name, and the current loop iteration as an image to the images list.
-            self.images.append(pygame.image.load(self.path + "/" + self.name + str(i + 1) + ".bmp"))
+            self.images.append(pygame.image.load(self.path + "/" + self.name + str(i + 1) + ".bmp").convert_alpha(screen))
 
     #Pre-make the rotated images for slower loading times, but faster runtime.
     def make_rotated_images(self, degree_increments: int) -> bool:
@@ -48,9 +50,9 @@ class spritesheet:
         rotator = self.images[0]
 
         for i in range(int(360 / degree_increments) - 1):
-            self.images.append(pygame.transform.rotate(rotator, (i + 1 + start - 90) * degree_increments))
+            self.images.append(pygame.transform.rotate(rotator, (i + 1 + start) * degree_increments))
 
-            if (i + 1 + start - 90) * degree_increments >= end - 90:
+            if (i + 1 + start) * degree_increments >= end:
                 break
 
     #Return a new sprite found at the index of the spritesheet.
@@ -92,6 +94,8 @@ class sprite:
         self.image = images[index]
         self.current_brightness = 0
         self.origin_image = images[index].copy()
+        self.origin_image_string = pygame.image.tostring(self.origin_image, "RGBA")
+        self.size = 1.0
 
     #Simply rotates the sprite's image horizontally.
     def flip_horizontal(self) -> 'sprite':
@@ -116,10 +120,15 @@ class sprite:
         height = self.origin_image.get_height()
 
         self.image = pygame.transform.smoothscale(self.origin_image, (width * percent, height * percent))
+        self.size = percent
 
-    def set_brightness(self, brightness: int) -> None:
-        pass
-        #self.image = ImageEnhance.Brightness(self.origin_image).enhance(brightness)
+    def set_brightness(self, brightness: float) -> None:
+        image = Image.frombuffer("RGBA", self.origin_image.get_size(), self.origin_image_string, "raw", "RGBA", 0, 1)
+        enhancer = ImageEnhance.Brightness(image)
+        new_image = enhancer.enhance(brightness)
+
+        self.image = pygame.image.fromstring(new_image.tobytes(), new_image.size, new_image.mode)
+        self.resize_image_set(1.0)
     
     #Easy way to get the width of the image.
     def get_width(self) -> int:
@@ -255,46 +264,46 @@ class animation:
 
         return animation(sprites, self.increment)
 
-FLOWEY_PATH = "Resources/Images/Omega Flowey/"
+class predef_spritesheets:
+    def __init__(self, screen: pygame.Surface) -> None:
+        self.FLOWEY_PATH = "Resources/Images/Omega Flowey/"
 
-#STALKS ANIMATION
-STALKS_SPRITESHEET = spritesheet(FLOWEY_PATH + "Stalks", "Stalk", 62).resize_images(0.4)
-STALKS_ANIMATION_LEFT = animation(STALKS_SPRITESHEET.get_sprites(), 1)
-STALKS_ANIMATION_RIGHT = STALKS_ANIMATION_LEFT.flip_all_horizontally()
+        #STALKS ANIMATION
+        self.STALKS_SPRITESHEET = spritesheet(screen, self.FLOWEY_PATH + "Stalks", "Stalk", 62).resize_images(0.4)
+        self.STALKS_ANIMATION_LEFT = animation(self.STALKS_SPRITESHEET.get_sprites(), 1)
+        self.STALKS_ANIMATION_RIGHT = self.STALKS_ANIMATION_LEFT.flip_all_horizontally()
 
-#ORGANS ANIMATION
-ORGANS_SPRITESHEET = spritesheet(FLOWEY_PATH + "Misc", "Organs", 1).resize_images(0.6)
-ORGANS_ANIMATION_LEFT = animation(ORGANS_SPRITESHEET.get_sprites(), 0)
-ORGANS_ANIMATION_RIGHT = ORGANS_ANIMATION_LEFT.flip_all_horizontally()
+        #ORGANS ANIMATION
+        self.ORGANS_SPRITESHEET = spritesheet(screen, self.FLOWEY_PATH + "Misc", "Organs", 1).resize_images(0.6)
+        self.ORGANS_ANIMATION_LEFT = animation(self.ORGANS_SPRITESHEET.get_sprites(), 0)
+        self.ORGANS_ANIMATION_RIGHT = self.ORGANS_ANIMATION_LEFT.flip_all_horizontally()
 
-#HANDS ANIMATION
-HANDS_SPRITESHEET = spritesheet(FLOWEY_PATH + "Hands", "Hand", 1).resize_images(0.5)
-HANDS_ANIMATION_LEFT = animation(HANDS_SPRITESHEET.get_sprites(), 0)
-HANDS_ANIMATION_RIGHT = HANDS_ANIMATION_LEFT.flip_all_horizontally()
+        #HANDS ANIMATION
+        self.HANDS_SPRITESHEET = spritesheet(screen, self.FLOWEY_PATH + "Hands", "Hand", 1).resize_images(0.5)
+        self.HANDS_ANIMATION_LEFT = animation(self.HANDS_SPRITESHEET.get_sprites(), 0)
+        self.HANDS_ANIMATION_RIGHT = self.HANDS_ANIMATION_LEFT.flip_all_horizontally()
 
-#VINES ANIMATION
-VINES_1_SPRITESHEET = spritesheet(FLOWEY_PATH + "Misc", "Vine1-", 1).resize_images(0.5)
-VINES_1_ANIMATION_LEFT = animation(VINES_1_SPRITESHEET.get_sprites(), 0)
-VINES_1_ANIMATION_RIGHT = VINES_1_ANIMATION_LEFT.flip_all_horizontally()
-VINES_2_SPRITESHEET = spritesheet(FLOWEY_PATH + "Misc", "Vine2-", 1).resize_images(0.5)
-VINES_2_ANIMATION_LEFT = animation(VINES_2_SPRITESHEET.get_sprites(), 0)
-VINES_2_ANIMATION_RIGHT = VINES_2_ANIMATION_LEFT.flip_all_horizontally()
-VINES_3_SPRITESHEET = spritesheet(FLOWEY_PATH + "Misc", "Vine3-", 1).resize_images(0.5)
-VINES_3_ANIMATION_LEFT = animation(VINES_3_SPRITESHEET.get_sprites(), 0)
-VINES_3_ANIMATION_RIGHT = VINES_3_ANIMATION_LEFT.flip_all_horizontally()
+        #VINES ANIMATION
+        self.VINES_1_SPRITESHEET = spritesheet(screen, self.FLOWEY_PATH + "Misc", "Vine1-", 1).resize_images(0.5)
+        self.VINES_1_ANIMATION_LEFT = animation(self.VINES_1_SPRITESHEET.get_sprites(), 0)
+        self.VINES_1_ANIMATION_RIGHT = self.VINES_1_ANIMATION_LEFT.flip_all_horizontally()
+        self.VINES_2_SPRITESHEET = spritesheet(screen, self.FLOWEY_PATH + "Misc", "Vine2-", 1).resize_images(0.5)
+        self.VINES_2_ANIMATION_LEFT = animation(self.VINES_2_SPRITESHEET.get_sprites(), 0)
+        self.VINES_2_ANIMATION_RIGHT = self.VINES_2_ANIMATION_LEFT.flip_all_horizontally()
+        self.VINES_3_SPRITESHEET = spritesheet(screen, self.FLOWEY_PATH + "Misc", "Vine3-", 1).resize_images(0.5)
+        self.VINES_3_ANIMATION_LEFT = animation(self.VINES_3_SPRITESHEET.get_sprites(), 0)
+        self.VINES_3_ANIMATION_RIGHT = self.VINES_3_ANIMATION_LEFT.flip_all_horizontally()
 
-#TV ANIMATION
-TV_SPRITESHEET = spritesheet(FLOWEY_PATH + "TV", "TV", 3).resize_images(0.5)
-TV_ANIMATION = animation(TV_SPRITESHEET.get_sprites(), 0)
+        #TV ANIMATION
+        self.TV_SPRITESHEET = spritesheet(screen, self.FLOWEY_PATH + "TV", "TV", 3).resize_images(0.5)
+        self.TV_ANIMATION = animation(self.TV_SPRITESHEET.get_sprites(), 0)
 
-#FULL HEAD ANIMATION
-HEAD_SPRITESHEET = spritesheet(FLOWEY_PATH + "Head", "Head", 10).resize_images(0.5)
-HEAD_ANIMATION = animation(HEAD_SPRITESHEET.get_sprites(), 0)
+        #FULL HEAD ANIMATION
+        self.HEAD_SPRITESHEET = spritesheet(screen, self.FLOWEY_PATH + "Head", "Head", 10).resize_images(0.5)
+        self.HEAD_ANIMATION = animation(self.HEAD_SPRITESHEET.get_sprites(), 0)
 
-#EYE SOCKET ANIMATION
-EYE_SOCKET_SPRITESHEET_LEFT = spritesheet(FLOWEY_PATH + "Eyes", "EyeSocketLeft", 1).resize_images(0.5)
-EYE_SOCKET_SPRITESHEET_LEFT.make_rotated_images_range(0.5, -5, 5)
-EYE_SOCKET_SPRITESHEET_RIGHT = spritesheet(FLOWEY_PATH + "Eyes", "EyeSocketRight", 1).resize_images(0.5)
-EYE_SOCKET_SPRITESHEET_RIGHT.make_rotated_images_range(0.5, -5, 5)
-EYE_SOCKET_ANIMATION_LEFT = animation(EYE_SOCKET_SPRITESHEET_LEFT.get_sprites(), 0)
-EYE_SOCKET_ANIMATION_RIGHT = animation(EYE_SOCKET_SPRITESHEET_RIGHT.get_sprites(), 0)
+        #EYE SOCKET ANIMATION
+        self.EYE_SOCKET_SPRITESHEET_LEFT = spritesheet(screen, self.FLOWEY_PATH + "Eyes", "EyeSocketLeft", 1).resize_images(0.5)
+        self.EYE_SOCKET_SPRITESHEET_RIGHT = spritesheet(screen, self.FLOWEY_PATH + "Eyes", "EyeSocketRight", 1).resize_images(0.5)
+        self.EYE_SOCKET_ANIMATION_LEFT = animation(self.EYE_SOCKET_SPRITESHEET_LEFT.get_sprites(), 0)
+        self.EYE_SOCKET_ANIMATION_RIGHT = animation(self.EYE_SOCKET_SPRITESHEET_RIGHT.get_sprites(), 0)

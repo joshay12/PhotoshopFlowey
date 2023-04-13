@@ -1,3 +1,4 @@
+from pickle import FALSE
 from sprites import *
 from entity import *
 from math import sin, cos
@@ -6,12 +7,13 @@ STALK_SPEED = 3
 ORGAN_SIZE_OFFSET = 1.0
 
 class flowey:
-    def __init__(self, x: int, y: int) -> None:
+    def __init__(self, sheets: predef_spritesheets, x: int, y: int) -> None:
         global ORGAN_SIZE_OFFSET
 
         self.x = x;
         self.y = y;
-        self.brightness = 0
+        self.brightness = 0.0
+        self.sheets = sheets
 
         self.entities = entity_collection()
 
@@ -51,26 +53,33 @@ class flowey:
 
         self.tick = 0
 
-        self.set_brightness_all()
+        #self.set_brightness_all()
 
     def set_brightness_all(self) -> None:
         for entity in self.entities.entities:
             entity.set_brightness(self.brightness)
 
+    def readjust_sizes(self) -> None:
+        for entity in self.entities.entities:
+            entity.readjust_size()
+
     def update(self) -> None:
         for entity in self.entities.entities:
             entity.update()
 
-        self.tick += 1
-
-        if self.tick == 1:
-            self.set_brightness_all()
-        elif self.tick > 120 and self.tick % 2 == 0 and self.brightness < 1:
-            self.brightness += 0.05
-            self.set_brightness_all()
-        elif self.brightness > 1:
-            self.brightness = 1
-            self.set_brightness_all()
+        #self.tick += 1
+        #
+        #if self.tick == 5:
+        #    self.fully_bright = False
+        #    #self.set_brightness_all()
+        #elif self.tick > 120 and self.tick % 2 == 0 and self.brightness < 1.0:
+        #    self.brightness += 0.1
+        #    self.set_brightness_all()
+        #elif self.tick > 120 and self.tick % 2 == 0 and not self.fully_bright:
+        #    self.brightness = 1.0
+        #    self.set_brightness_all()
+        #    self.readjust_sizes()
+        #    self.fully_bright = True
 
     def render(self, screen: Surface) -> None:
         for entity in self.entities.entities:
@@ -91,9 +100,12 @@ class flowey_piece(entity):
         self.origin_direction = self.direction
         self.origin_image_direction = self.image_direction
 
-    def set_brightness(self, brightness: int) -> None:
+    def set_brightness(self, brightness: float) -> None:
         for item in self.animation.sprites:
             item.set_brightness(brightness)
+
+    def readjust_size(self) -> None:
+        self.animation.resize_images(1.0)
 
     def render(self, screen: Surface) -> None:        
         screen.blit(self.get_sprite().image, self.get_data())
@@ -101,7 +113,7 @@ class flowey_piece(entity):
 #These are the green stalks with thorns on them on the left and right side of Flowey.
 class stalks(flowey_piece):
     def __init__(self, owner: flowey, x: int, y: int, flip: bool = False) -> None:
-        super().__init__(owner, STALKS_ANIMATION_LEFT, STALKS_ANIMATION_RIGHT, x, y, flip, 7)
+        super().__init__(owner, owner.sheets.STALKS_ANIMATION_LEFT, owner.sheets.STALKS_ANIMATION_RIGHT, x, y, flip, 7)
 
     def update(self) -> None:
         self.tick += 1
@@ -117,7 +129,7 @@ class stalks(flowey_piece):
 #There are 6 organs for Flowey. They are the objects in the top-left and top-right corners which look like pipes.
 class organ(flowey_piece):
     def __init__(self, owner: flowey, x: int, y: int, flip: bool, layer_offset: int) -> None:
-        super().__init__(owner, ORGANS_ANIMATION_LEFT, ORGANS_ANIMATION_RIGHT, x, y, flip, 6 - layer_offset)
+        super().__init__(owner, owner.sheets.ORGANS_ANIMATION_LEFT, owner.sheets.ORGANS_ANIMATION_RIGHT, x, y, flip, 6 - layer_offset)
 
         global ORGAN_SIZE_OFFSET
 
@@ -150,7 +162,7 @@ class organ(flowey_piece):
 #There are 2 hands for Flowey. They are the objects in the bottom-left and bottom-right corners which look like hands (... obviously).
 class hand(flowey_piece):
     def __init__(self, owner: flowey, x: int, y: int, flip: bool) -> None:
-        super().__init__(owner, HANDS_ANIMATION_LEFT, HANDS_ANIMATION_RIGHT, x, y, flip, 0)
+        super().__init__(owner, owner.sheets.HANDS_ANIMATION_LEFT, owner.sheets.HANDS_ANIMATION_RIGHT, x, y, flip, 0)
 
     def update(self) -> None:
         #If the stalks are moving at a certain pace, then increase the bobbing ticks.
@@ -171,7 +183,7 @@ class hand(flowey_piece):
 #This is the first iteration of the vines.
 class vine_1(flowey_piece):
     def __init__(self, owner: flowey, x: int, y: int, flip: bool) -> None:
-        super().__init__(owner, VINES_1_ANIMATION_LEFT, VINES_1_ANIMATION_RIGHT, x, y, flip, 3)
+        super().__init__(owner, owner.sheets.VINES_1_ANIMATION_LEFT, owner.sheets.VINES_1_ANIMATION_RIGHT, x, y, flip, 3)
 
     def update(self) -> None:
         #If the stalks are moving at a certain pace, then increase the bobbing ticks.
@@ -191,7 +203,7 @@ class vine_1(flowey_piece):
 #This is the second iteration of the vines.
 class vine_2(flowey_piece):
     def __init__(self, owner: flowey, x: int, y: int, flip: bool) -> None:
-        super().__init__(owner, VINES_2_ANIMATION_LEFT, VINES_2_ANIMATION_RIGHT, x, y, flip, 2)
+        super().__init__(owner, owner.sheets.VINES_2_ANIMATION_LEFT, owner.sheets.VINES_2_ANIMATION_RIGHT, x, y, flip, 2)
 
     def update(self) -> None:
         #If the stalks are moving at a certain pace, then increase the bobbing ticks.
@@ -211,7 +223,7 @@ class vine_2(flowey_piece):
 #This is the third and final iteration of the vines.
 class vine_3(flowey_piece):
     def __init__(self, owner: flowey, x: int, y: int, flip: bool) -> None:
-        super().__init__(owner, VINES_3_ANIMATION_LEFT, VINES_3_ANIMATION_RIGHT, x, y, flip, 1)
+        super().__init__(owner, owner.sheets.VINES_3_ANIMATION_LEFT, owner.sheets.VINES_3_ANIMATION_RIGHT, x, y, flip, 1)
 
     def update(self) -> None:
         #If the stalks are moving at a certain pace, then increase the bobbing ticks.
@@ -231,7 +243,7 @@ class vine_3(flowey_piece):
 #This is the TV atop Flowey's head.
 class television(flowey_piece):
     def __init__(self, owner: flowey, x: int, y: int) -> None:
-        super().__init__(owner, TV_ANIMATION, TV_ANIMATION, x, y, False, 100)
+        super().__init__(owner, owner.sheets.TV_ANIMATION, owner.sheets.TV_ANIMATION, x, y, False, 100)
 
         self.animation.set_current(1)
 
@@ -250,7 +262,7 @@ class television(flowey_piece):
 #This is the top of the head just below the TV.
 class head_top(flowey_piece):
     def __init__(self, owner: flowey, x: int, y: int) -> None:
-        super().__init__(owner, HEAD_ANIMATION, HEAD_ANIMATION, x, y, False, 25)
+        super().__init__(owner, owner.sheets.HEAD_ANIMATION, owner.sheets.HEAD_ANIMATION, x, y, False, 25)
 
         self.animation.set_current(0)
 
@@ -268,7 +280,7 @@ class head_top(flowey_piece):
 #These are the nostrils inside of the top head.
 class head_nostrils(flowey_piece):
     def __init__(self, owner: flowey, x: int, y: int) -> None:
-        super().__init__(owner, HEAD_ANIMATION.copy(), HEAD_ANIMATION.copy(), x, y, False, 27)
+        super().__init__(owner, owner.sheets.HEAD_ANIMATION.copy(), owner.sheets.HEAD_ANIMATION.copy(), x, y, False, 27)
 
         self.animation.sprites[8].resize_image(1.1)
         self.animation.sprites[9].resize_image(1.1)
@@ -298,7 +310,7 @@ class head_nostrils(flowey_piece):
 #This is the bottom of the head, right in between the lips.
 class head_bottom(flowey_piece):
     def __init__(self, owner: flowey, x: int, y: int) -> None:
-        super().__init__(owner, HEAD_ANIMATION.copy(), HEAD_ANIMATION.copy(), x, y, False, 24)
+        super().__init__(owner, owner.sheets.HEAD_ANIMATION.copy(), owner.sheets.HEAD_ANIMATION.copy(), x, y, False, 24)
 
         self.animation.sprites[3].resize_image(1.3)
         self.animation.set_current(3)
@@ -311,7 +323,7 @@ class head_bottom(flowey_piece):
 #These are the lips just below the head.
 class head_lip(flowey_piece):
     def __init__(self, owner: flowey, x: int, y: int, flip: bool) -> None:
-        super().__init__(owner, HEAD_ANIMATION.copy(), HEAD_ANIMATION.copy(), x, y, flip, 28)
+        super().__init__(owner, owner.sheets.HEAD_ANIMATION.copy(), owner.sheets.HEAD_ANIMATION.copy(), x, y, flip, 28)
 
         self.animation.set_current(4 if not flip else 5)
 
@@ -333,7 +345,7 @@ class head_lip(flowey_piece):
 #These are the teeth attached to the lips.
 class head_teeth(flowey_piece):
     def __init__(self, owner: flowey, x: int, y: int, flip: bool) -> None:
-        super().__init__(owner, HEAD_ANIMATION.copy(), HEAD_ANIMATION.copy(), x, y, flip, 29)
+        super().__init__(owner, owner.sheets.HEAD_ANIMATION.copy(), owner.sheets.HEAD_ANIMATION.copy(), x, y, flip, 29)
 
         self.animation.set_current(6 if not flip else 7)
 
@@ -355,7 +367,7 @@ class head_teeth(flowey_piece):
 #These are the dimples which go above the lips/teeth.
 class head_dimple(flowey_piece):
     def __init__(self, owner: flowey, x: int, y: int, flip: bool) -> None:
-        super().__init__(owner, HEAD_ANIMATION.copy(), HEAD_ANIMATION.copy(), x, y, flip, 30)
+        super().__init__(owner, owner.sheets.HEAD_ANIMATION.copy(), owner.sheets.HEAD_ANIMATION.copy(), x, y, flip, 30)
 
         self.animation.sprites[1].resize_image(1.15)
         self.animation.sprites[2].resize_image(1.15)
@@ -379,7 +391,7 @@ class head_dimple(flowey_piece):
 #These are the eye-sockets which go to the outer rim of the lips.
 class eye_socket(flowey_piece):
     def __init__(self, owner: flowey, x: int, y: int, flip: bool) -> None:
-        super().__init__(owner, EYE_SOCKET_ANIMATION_LEFT, EYE_SOCKET_ANIMATION_RIGHT, x, y, flip, 31)
+        super().__init__(owner, owner.sheets.EYE_SOCKET_ANIMATION_LEFT, owner.sheets.EYE_SOCKET_ANIMATION_RIGHT, x, y, flip, 31)
 
         self.animation.increment = 1
 
@@ -394,13 +406,7 @@ class eye_socket(flowey_piece):
 
         #Handles the movement of the vines to be natural.
         bobbing_y = sin(self.tick) * 2
-        bobbing_image_dir = sin(self.tick / 5) * (5 if self.origin_x > 300 else -5)
 
         #Allows the owner (Flowey) to affect the x and y positioning of the organs.
         self.x = self.origin_x + self.owner.x# - bobbing_image_dir
         self.y = self.origin_y + self.owner.y + bobbing_y
-        self.image_direction = self.origin_image_direction + bobbing_image_dir
-
-        print(int((self.image_direction - 90) / 2))
-
-        self.animation.set_current(int((self.image_direction - 90) / 2))

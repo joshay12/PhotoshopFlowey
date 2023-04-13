@@ -1,22 +1,29 @@
 from input import keyboard
+from sprites import predef_spritesheets, SPRITESHEETS
 from entity import *
 from flowey import flowey
 import pygame
 
+GLOBAL_SCREEN = None
+
 class window:
     def __init__(self, title: str) -> None:
+        global GLOBAL_SCREEN, SPRITESHEETS
+
         pygame.init()
 
         self.title = title
         self.screen = pygame.display.set_mode((640, 480))
         pygame.display.set_caption(self.title)
-        pygame.display.flip()
+
+        GLOBAL_SCREEN = self.screen
+        SPRITESHEETS = predef_spritesheets(self.screen)
 
         self.running = False
         self.keyboard = keyboard()
         self.clock = pygame.time.Clock()
         self.entities = entity_collection()
-        self.flowey = flowey(0, 0)
+        self.flowey = flowey(SPRITESHEETS, 0, 0)
 
     def run(self) -> None:
         self.running = True
