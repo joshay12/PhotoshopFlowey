@@ -50,6 +50,10 @@ class flowey:
 
         self.entities.add(eye_socket(self, 230, 118, False))
         self.entities.add(eye_socket(self, 360, 122, True))
+        self.entities.add(eye(self, 239, 135, False))
+        self.entities.add(eye(self, 371, 135, True))
+        self.entities.add(eye_pupil(self, 252, 174, False))
+        self.entities.add(eye_pupil(self, 381, 181, True))
 
         self.tick = 0
 
@@ -393,10 +397,7 @@ class eye_socket(flowey_piece):
     def __init__(self, owner: flowey, x: int, y: int, flip: bool) -> None:
         super().__init__(owner, owner.sheets.EYE_SOCKET_ANIMATION_LEFT, owner.sheets.EYE_SOCKET_ANIMATION_RIGHT, x, y, flip, 31)
 
-        self.animation.increment = 1
-
-        for sprite in self.animation.sprites:
-            sprite.resize_image(0.8)
+        self.get_sprite().resize_image(0.8)
 
     def update(self) -> None:
         self.animation.update()
@@ -408,5 +409,46 @@ class eye_socket(flowey_piece):
         bobbing_y = sin(self.tick) * 2
 
         #Allows the owner (Flowey) to affect the x and y positioning of the organs.
-        self.x = self.origin_x + self.owner.x# - bobbing_image_dir
+        self.x = self.origin_x + self.owner.x
         self.y = self.origin_y + self.owner.y + bobbing_y
+
+#These are the eyes which go in the eye sockets.
+class eye(flowey_piece):
+    def __init__(self, owner: flowey, x: int, y: int, flip: bool) -> None:
+        super().__init__(owner, owner.sheets.EYE_ANIMATION_LEFT, owner.sheets.EYE_ANIMATION_RIGHT, x, y, flip, 32)
+
+        self.get_sprite().resize_image(0.75)
+
+    def update(self) -> None:
+        self.animation.update()
+        #If the stalks are moving at a certain pace, then increase the bobbing ticks.
+        if STALK_SPEED > 1:
+            self.tick += 0.2
+
+        #Handles the movement of the vines to be natural.
+        bobbing_y = sin(self.tick) * 1.5
+
+        #Allows the owner (Flowey) to affect the x and y positioning of the organs.
+        self.x = self.origin_x + self.owner.x
+        self.y = self.origin_y + self.owner.y + bobbing_y
+
+#These are the pupils which go in the eyes.
+class eye_pupil(flowey_piece):
+    def __init__(self, owner: flowey, x: int, y: int, flip: bool) -> None:
+        super().__init__(owner, owner.sheets.PUPIL_ANIMATION, owner.sheets.PUPIL_ANIMATION, x, y, flip, 33)
+
+        self.get_sprite().resize_image(0.5)
+
+    def update(self) -> None:
+        self.animation.update()
+        #If the stalks are moving at a certain pace, then increase the bobbing ticks.
+        if STALK_SPEED > 1:
+            self.tick += 0.2
+
+        #Handles the movement of the vines to be natural.
+        bobbing_y = sin(self.tick) * 1.6
+
+        #Allows the owner (Flowey) to affect the x and y positioning of the organs.
+        self.x = self.origin_x + self.owner.x
+        self.y = self.origin_y + self.owner.y + bobbing_y
+        self.get_sprite().resize_image_set(0.5 + (sin(self.tick * 1.15) * 15 / 100.0))

@@ -307,3 +307,13 @@ class predef_spritesheets:
         self.EYE_SOCKET_SPRITESHEET_RIGHT = spritesheet(screen, self.FLOWEY_PATH + "Eyes", "EyeSocketRight", 1).resize_images(0.5)
         self.EYE_SOCKET_ANIMATION_LEFT = animation(self.EYE_SOCKET_SPRITESHEET_LEFT.get_sprites(), 0)
         self.EYE_SOCKET_ANIMATION_RIGHT = animation(self.EYE_SOCKET_SPRITESHEET_RIGHT.get_sprites(), 0)
+
+        #SIDE EYE ANIMATION
+        self.EYE_SPRITESHEET_LEFT = spritesheet(screen, self.FLOWEY_PATH + "Eyes", "EyeLeft", 1).resize_images(0.5)
+        self.EYE_SPRITESHEET_RIGHT = spritesheet(screen, self.FLOWEY_PATH + "Eyes", "EyeRight", 1).resize_images(0.5)
+        self.EYE_ANIMATION_LEFT = animation(self.EYE_SPRITESHEET_LEFT.get_sprites(), 0)
+        self.EYE_ANIMATION_RIGHT = animation(self.EYE_SPRITESHEET_RIGHT.get_sprites(), 0)
+
+        #PUPIL ANIMATION
+        self.PUPIL_SPRITESHEET = spritesheet(screen, self.FLOWEY_PATH + "Eyes", "Pupil", 2)
+        self.PUPIL_ANIMATION = animation(self.PUPIL_SPRITESHEET.get_sprites(), 0)
