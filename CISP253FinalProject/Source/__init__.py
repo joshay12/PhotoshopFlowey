@@ -2,7 +2,7 @@ from input import keyboard
 from sprites import predef_spritesheets, SPRITESHEETS
 from entity import *
 from flowey import flowey
-from fonts import undertale_font
+from fonts import undertale_font, undertale_yellow_font
 import pygame
 
 GLOBAL_SCREEN = None
@@ -25,7 +25,8 @@ class window:
         self.clock = pygame.time.Clock()
         self.entities = entity_collection()
         self.flowey = flowey(SPRITESHEETS, 0, 0)
-        self.font = undertale_font(SPRITESHEETS.UNDERTALE_FONT_ANIMATION)
+        self.font = undertale_font(SPRITESHEETS)
+        self.font_yellow = undertale_yellow_font(SPRITESHEETS)
 
         self.flowey.visible = False
 
@@ -46,7 +47,7 @@ class window:
             delta_time += self.clock.tick() / 1000.0
 
             if tick == 60:
-                self.font.say("Hello World!\nThis is a test...", 30, 300, True)
+                self.font_yellow.say(self.font_yellow.ALLOWED_CHARS, 30, 300, True, 0)
 
             while delta_time >= 1.0 / updates_per_second:
                 self.update()
@@ -64,6 +65,7 @@ class window:
         self.flowey.update()
         self.entities.update()
         self.font.update()
+        self.font_yellow.update()
 
     def render(self) -> None:
         self.screen.fill((0, 0, 0))
@@ -71,6 +73,7 @@ class window:
         self.entities.render(self.screen)
         self.flowey.render(self.screen)
         self.font.render(self.screen)
+        self.font_yellow.render(self.screen)
 
         pygame.display.flip()
 
