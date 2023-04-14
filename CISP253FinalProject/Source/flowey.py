@@ -13,6 +13,7 @@ class flowey:
         self.y = y;
         self.brightness = 0.0
         self.sheets = sheets
+        self.visible = True
 
         self.entities = entity_collection()
 
@@ -186,6 +187,9 @@ class flowey:
         #    self.fully_bright = True
 
     def render(self, screen: Surface) -> None:
+        if not self.visible:
+            return
+
         for entity in self.entities.entities:
             entity.render(screen)
 
@@ -211,7 +215,10 @@ class flowey_piece(entity):
     def readjust_size(self) -> None:
         self.animation.resize_images(1.0)
 
-    def render(self, screen: Surface) -> None:        
+    def render(self, screen: Surface) -> None:
+        if not self.visible:
+            return
+
         screen.blit(self.get_sprite().image, self.get_data())
 
 #There is a backdrop for Flowey. This is behind Flowey's piping, head, and TV to prevent the stalks and organs from peeking through

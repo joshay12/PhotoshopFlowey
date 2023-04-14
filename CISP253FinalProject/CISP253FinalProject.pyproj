@@ -23,6 +23,7 @@
   <ItemGroup>
     <Compile Include="Source\entity.py" />
     <Compile Include="Source\flowey.py" />
+    <Compile Include="Source\fonts.py" />
     <Compile Include="Source\sprites.py" />
     <Compile Include="Source\input.py" />
     <Compile Include="Source\__init__.py" />
