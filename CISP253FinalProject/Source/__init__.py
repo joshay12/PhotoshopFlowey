@@ -2,6 +2,7 @@ from input import keyboard
 from sprites import predef_spritesheets, SPRITESHEETS
 from entity import *
 from flowey import flowey
+from fonts import undertale_font
 import pygame
 
 GLOBAL_SCREEN = None
@@ -24,12 +25,15 @@ class window:
         self.clock = pygame.time.Clock()
         self.entities = entity_collection()
         self.flowey = flowey(SPRITESHEETS, 0, 0)
+        self.font = undertale_font(SPRITESHEETS.UNDERTALE_FONT_ANIMATION)
 
     def run(self) -> None:
         self.running = True
 
         delta_time = 0.0
         updates_per_second = 60
+
+        self.font.say("Hello World!", 30, 300, 15)
 
         while self.running:
             for event in pygame.event.get():
@@ -52,12 +56,14 @@ class window:
     def update(self) -> None:
         self.flowey.update()
         self.entities.update()
+        self.font.update()
 
     def render(self) -> None:
         self.screen.fill((0, 0, 0))
 
         self.entities.render(self.screen)
         self.flowey.render(self.screen)
+        self.font.render(self.screen)
 
         pygame.display.flip()
 
