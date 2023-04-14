@@ -22,10 +22,10 @@ class spritesheet:
     #Pre-make the rotated images for slower loading times, but faster runtime.
     def make_rotated_images(self, degree_increments: int) -> bool:
         #Do not allow anything more or less than 1 image in the spritesheet.
-        if len(self.images > 1):
+        if len(self.images) > 1:
             print("You cannot have more than 1 image in the spritesheet to make rotated images.")
             return False
-        elif len(self.images == 0):
+        elif len(self.images) == 0:
             print("You cannot have 0 images in the spritesheet to make rotated images.")
             return False
 
@@ -128,7 +128,7 @@ class sprite:
         new_image = enhancer.enhance(brightness)
 
         self.image = pygame.image.fromstring(new_image.tobytes(), new_image.size, new_image.mode)
-        self.resize_image_set(1.0)
+        #self.resize_image_set(1.0)
     
     #Easy way to get the width of the image.
     def get_width(self) -> int:
@@ -169,6 +169,10 @@ class animation:
             elif self.amount_to_skip != 1:
                 #If the amount of images to skip in the animation is more or less than 1, then proceed to skip frames of the animation.
                 self.change_animation(self.amount_to_skip)
+
+    def clear_all_but(self, index: int) -> 'animation':
+        #return self
+        return animation([self.sprites[index - 1]], self.increment)
 
     #Flips all sprites in the animation horizontally.
     def flip_all_horizontally(self) -> 'animation':
@@ -268,6 +272,14 @@ class predef_spritesheets:
     def __init__(self, screen: pygame.Surface) -> None:
         self.FLOWEY_PATH = "Resources/Images/Omega Flowey/"
 
+        #SCREEN ANIMATION
+        self.SCREEN_SPRITESHEET = spritesheet(screen, "Resources/Images/Filters/", "screen", 1)
+        self.SCREEN_ANIMATION = animation(self.SCREEN_SPRITESHEET.get_sprites(), 0)
+
+        #BACKGROUND ANIMATION
+        self.BACKGROUND_SPRITESHEET = spritesheet(screen, self.FLOWEY_PATH + "Misc", "Backdrop", 1)
+        self.BACKGROUND_ANIMATION = animation(self.BACKGROUND_SPRITESHEET.get_sprites(), 0)
+
         #STALKS ANIMATION
         self.STALKS_SPRITESHEET = spritesheet(screen, self.FLOWEY_PATH + "Stalks", "Stalk", 62).resize_images(0.4)
         self.STALKS_ANIMATION_LEFT = animation(self.STALKS_SPRITESHEET.get_sprites(), 1)
@@ -307,3 +319,24 @@ class predef_spritesheets:
         self.EYE_SOCKET_SPRITESHEET_RIGHT = spritesheet(screen, self.FLOWEY_PATH + "Eyes", "EyeSocketRight", 1).resize_images(0.5)
         self.EYE_SOCKET_ANIMATION_LEFT = animation(self.EYE_SOCKET_SPRITESHEET_LEFT.get_sprites(), 0)
         self.EYE_SOCKET_ANIMATION_RIGHT = animation(self.EYE_SOCKET_SPRITESHEET_RIGHT.get_sprites(), 0)
+
+        #SIDE EYE ANIMATION
+        self.EYE_SPRITESHEET_LEFT = spritesheet(screen, self.FLOWEY_PATH + "Eyes", "EyeLeft", 1).resize_images(0.5)
+        self.EYE_SPRITESHEET_RIGHT = spritesheet(screen, self.FLOWEY_PATH + "Eyes", "EyeRight", 1).resize_images(0.5)
+        self.EYE_ANIMATION_LEFT = animation(self.EYE_SPRITESHEET_LEFT.get_sprites(), 0)
+        self.EYE_ANIMATION_RIGHT = animation(self.EYE_SPRITESHEET_RIGHT.get_sprites(), 0)
+
+        #PUPIL ANIMATION
+        self.PUPIL_SPRITESHEET = spritesheet(screen, self.FLOWEY_PATH + "Eyes", "Pupil", 2)
+        self.PUPIL_ANIMATION = animation(self.PUPIL_SPRITESHEET.get_sprites(), 0)
+
+        #PIPE ANIMATION
+        self.PIPE_SPRITESHEET = spritesheet(screen, self.FLOWEY_PATH + "Misc", "Pipe", 1)
+        self.PIPE_SPRITESHEET.make_rotated_images(2)
+        self.PIPE_ANIMATION = animation(self.PIPE_SPRITESHEET.get_sprites(), 0)
+
+        #TOP EYE ANIMATION
+        self.EYE_TOP_SPRITESHEET_LEFT = spritesheet(screen, self.FLOWEY_PATH + "Eyes", "EyeTopLeft", 1).resize_images(0.5)
+        self.EYE_TOP_SPRITESHEET_RIGHT = spritesheet(screen, self.FLOWEY_PATH + "Eyes", "EyeTopRight", 1).resize_images(0.5)
+        self.EYE_TOP_ANIMATION_LEFT = animation(self.EYE_TOP_SPRITESHEET_LEFT.get_sprites(), 0)
+        self.EYE_TOP_ANIMATION_RIGHT = animation(self.EYE_TOP_SPRITESHEET_RIGHT.get_sprites(), 0)
