@@ -21,6 +21,7 @@ class entity:
         self.direction = 90.0
         #Set for entities which need to rotate their image.
         self.image_direction = 90
+        self.visible = True
 
     #An abstract method for any object inheriting entity.
     #This method is used and will always run 60 times per second.

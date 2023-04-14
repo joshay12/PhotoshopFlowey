@@ -27,13 +27,14 @@ class window:
         self.flowey = flowey(SPRITESHEETS, 0, 0)
         self.font = undertale_font(SPRITESHEETS.UNDERTALE_FONT_ANIMATION)
 
+        self.flowey.visible = False
+
     def run(self) -> None:
         self.running = True
 
         delta_time = 0.0
         updates_per_second = 60
-
-        self.font.say("Hello World!", 30, 300, 15)
+        tick = 0
 
         while self.running:
             for event in pygame.event.get():
@@ -44,10 +45,16 @@ class window:
 
             delta_time += self.clock.tick() / 1000.0
 
+            if tick == 60:
+                self.font.say("Hello World!\nThis is a test...", 30, 300, True)
+
             while delta_time >= 1.0 / updates_per_second:
                 self.update()
 
                 delta_time -= 1.0 / updates_per_second
+
+            tick += 1
+
 
             self.render()
 
