@@ -6,7 +6,7 @@ SPRITESHEETS = None
 #A spritesheet class dedicated to handling more than one image and spliting them up amongst sprites.
 class spritesheet:
     #The constructor needs the path of the image(s), the name of the image(s), and the amount of items to loop through.
-    def __init__(self, screen: pygame.Surface, path: str, name: str, amount: int = 1) -> None:
+    def __init__(self, screen: pygame.Surface, path: str, name: str, amount: int = 1, extension: str = ".bmp") -> None:
         #Set up the class with its path, name, and amount properties.
         self.path = path
         self.name = name
@@ -17,7 +17,7 @@ class spritesheet:
         #Loop through the amount.
         for i in range(amount):
             #Append the path, name, and the current loop iteration as an image to the images list.
-            self.images.append(pygame.image.load(self.path + "/" + self.name + str(i + 1) + ".bmp").convert_alpha(screen))
+            self.images.append(pygame.image.load(self.path + "/" + self.name + str(i + 1) + extension).convert_alpha(screen))
 
     #Pre-make the rotated images for slower loading times, but faster runtime.
     def make_rotated_images(self, degree_increments: int) -> bool:
@@ -270,6 +270,12 @@ class animation:
 
 class predef_spritesheets:
     def __init__(self, screen: pygame.Surface) -> None:
+        self.UNDERTALE_FONT_SPRITESHEET = spritesheet(screen, "Resources/Images/Fonts/Undertale/", "", 94, ".png").resize_images(0.5)
+        self.UNDERTALE_FONT_ANIMATION = animation(self.UNDERTALE_FONT_SPRITESHEET.get_sprites(), 0)
+
+        self.UNDERTALE_YELLOW_FONT_SPRITESHEET = spritesheet(screen, "Resources/Images/Fonts/UndertaleYellow/", "", 21, ".png").resize_images(0.5)
+        self.UNDERTALE_YELLOW_FONT_ANIMATION = animation(self.UNDERTALE_YELLOW_FONT_SPRITESHEET.get_sprites(), 0)
+
         self.FLOWEY_PATH = "Resources/Images/Omega Flowey/"
 
         #SCREEN ANIMATION
