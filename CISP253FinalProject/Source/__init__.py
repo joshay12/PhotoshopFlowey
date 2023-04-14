@@ -12,6 +12,7 @@ class window:
         global GLOBAL_SCREEN, SPRITESHEETS
 
         pygame.init()
+        pygame.mixer.init(channels = 4)
 
         self.title = title
         self.screen = pygame.display.set_mode((640, 480))
