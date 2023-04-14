@@ -24,16 +24,22 @@
     <Compile Include="Source\entity.py" />
     <Compile Include="Source\flowey.py" />
     <Compile Include="Source\fonts.py" />
+    <Compile Include="Source\sound.py" />
     <Compile Include="Source\sprites.py" />
     <Compile Include="Source\input.py" />
     <Compile Include="Source\__init__.py" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Resources\Sounds\" />
     <Folder Include="Source\" />
     <Folder Include="Resources\" />
     <Folder Include="Resources\Images\" />
     <Folder Include="Resources\Images\Omega Flowey\" />
     <Folder Include="Resources\Images\Omega Flowey\Stalks\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\Sounds\flowey_intense.wav" />
+    <Content Include="Resources\Sounds\flowey_normal.wav" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

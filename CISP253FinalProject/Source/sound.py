@@ -1,13 +1,22 @@
 from pygame import mixer
 
+EFFECTS = None
+
 class effect:
-    def __init__(self, path: str, name: str, extension: str = ".mp3") -> None:
+    def __init__(self, path: str, name: str, extension: str = ".wav") -> None:
         self.sound = mixer.Sound(path + name + extension)
         self.channel = mixer.find_channel()
 
     def play(self, volume_left: float = 1.0, volume_right: float = 1.0) -> None:
         self.channel.set_volume(volume_left, volume_right)
-        self.channel.play()
+
+        if self.is_playing():
+            self.channel.stop()
+
+        self.channel.play(self.sound)
+
+    def is_playing(self) -> bool:
+        return self.channel.get_busy()
 
     def pause(self) -> None:
         self.channel.pause()
@@ -29,3 +38,4 @@ class predef_effects:
         location = "Resources/Sounds/"
 
         self.FLOWEY_TALK_NORMAL = effect(location, "flowey_normal")
+        self.FLOWEY_TALK_INTENSE = effect(location, "flowey_intense")
