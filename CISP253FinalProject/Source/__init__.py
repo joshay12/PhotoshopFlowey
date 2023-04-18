@@ -52,7 +52,7 @@ class window:
             delta_time += self.clock.tick() / 1000.0
 
             if tick == 60:
-                self.font.say("Howdy! It's me!\nFLOWEY the FLOWER.", 30, 300, False, EFFECTS.FLOWEY_TALK_INTENSE, 3)
+                self.font.say("Howdy! It's me!\nFLOWEY the FLOWER.", 30, 300, False, None, 3)
 
             while delta_time >= 1.0 / updates_per_second:
                 self.update()

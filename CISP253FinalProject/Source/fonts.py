@@ -60,7 +60,7 @@ class custom_font:
 
 					if char == '\n':
 						self.x = self.origin_x
-						self.y += 30
+						self.y += 38
 						self.extra_delay = 0
 					elif char == ',' or char == ':' or char == ';':
 						self.extra_delay = 10
@@ -83,7 +83,7 @@ class custom_font:
 
 						if char == '\n':
 							self.x = self.origin_x
-							self.y += 30
+							self.y += 38
 
 						self.current += 1
 
