@@ -25,7 +25,7 @@ class story:
 
 		#Parameter usage: Font, Text, X, Y, Sound Effect, Speed, Shake, Delay, Auto Proceed, and Change Event.
 		self.pre_story_lines.append(line(self.undertale, "Long ago, two races\nruled over the Earth:\nHUMANS and MONSTERS{d=75}", 100, 100, None, 4, 0, 0, True, False))
-		self.pre_story_lines.append(line(self.undertale, "One day, they{d=30}", 100, 100, None, 4, 0, 0, True, False))
+		self.pre_story_lines.append(line(self.undertale, "One day, the{d=30}", 100, 100, None, 4, 0, 0, True, False))
 		self.pre_story_lines.append(line(self.undertale, "One day, they all\ndisappeared without\na trace.{d=300}", 100, 100, None, 0, 0, 0, True, True))
 		self.pre_story_lines.append(clear_line(True))
 
