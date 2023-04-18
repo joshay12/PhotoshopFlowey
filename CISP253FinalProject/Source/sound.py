@@ -88,6 +88,7 @@ class predef_songs:
         location = "Resources/Sounds/Songs/"
 
         self.STORY = song(location, "story")
+        self.STORY_FROZEN = song(location, "frozen_story")
 
 class predef_effects:
     def __init__(self) -> None:
