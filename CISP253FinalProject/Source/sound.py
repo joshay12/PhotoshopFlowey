@@ -10,7 +10,9 @@ class song:
         self.channel = mixer.find_channel()
 
     def play(self, volume: float = 1.0, pitch: float = 1.0, loops: int = -1) -> None:
-        self.change_pitch(pitch)
+        if pitch != 1.0:
+            self.change_pitch(pitch)
+
         self.channel.set_volume(volume, volume)
 
         if self.is_playing():
@@ -48,7 +50,9 @@ class effect:
         self.channel = mixer.find_channel()
 
     def play(self, volume_left: float = 1.0, volume_right: float = 1.0, pitch: float = 1.0, loops: int = 0) -> None:
-        self.change_pitch(pitch)
+        if pitch != 1.0:
+            self.change_pitch(pitch)
+
         self.channel.set_volume(volume_left, volume_right)
 
         if self.is_playing():

@@ -25,9 +25,14 @@ class story_board:
         #Checks if the "Right" or "Left" button is currently held on the "Continue/Restart" screen.
         self.continue_or_restart_held = True
 
-    def begin(self) -> None:
-        self.story.play(self.story.pre_story_lines)
+    def begin(self, skip: int = 0) -> None:
         self.running = True
+
+        if skip == 0:
+            self.story.play(self.story.pre_story_lines)
+        elif skip == 1:
+            self.pause_loop = True
+            self.window.run_event(0, 1)
 
     def update(self) -> None:
         if self.running and not self.pause_loop:

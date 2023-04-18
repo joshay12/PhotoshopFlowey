@@ -5,6 +5,7 @@ from flowey import flowey
 from fonts import story
 from sound import predef_effects, predef_songs, EFFECTS, SONGS
 from story_board import story_board
+from player import character
 import pygame
 
 GLOBAL_SCREEN = None
@@ -30,6 +31,7 @@ class window:
         self.clock = pygame.time.Clock()
         self.entities = entity_collection()
         self.flowey = flowey(SPRITESHEETS, 0, 0)
+        self.character = character(640 // 2, 480 // 2, self.keyboard, SPRITESHEETS)
         self.board = story_board(story(SPRITESHEETS, self.keyboard), self)
 
         self.flowey.visible = False
@@ -60,7 +62,7 @@ class window:
                 delta_time -= 1.0 / updates_per_second
 
             if not self.board.running:
-                self.board.begin()
+                self.board.begin(1)
 
             tick += 1
 
@@ -72,6 +74,7 @@ class window:
         self.flowey.update()
         self.entities.update()
         self.board.update()
+        self.character.update()
 
     def render(self) -> None:
         self.screen.fill((0, 0, 0))
@@ -79,6 +82,7 @@ class window:
         self.entities.render(self.screen)
         self.flowey.render(self.screen)
         self.board.render(self.screen)
+        self.character.render(self.screen)
 
         pygame.display.flip()
 

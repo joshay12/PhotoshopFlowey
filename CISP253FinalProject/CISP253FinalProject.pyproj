@@ -24,6 +24,7 @@
     <Compile Include="Source\entity.py" />
     <Compile Include="Source\flowey.py" />
     <Compile Include="Source\fonts.py" />
+    <Compile Include="Source\player.py" />
     <Compile Include="Source\sound.py" />
     <Compile Include="Source\sprites.py" />
     <Compile Include="Source\input.py" />
@@ -31,6 +32,8 @@
     <Compile Include="Source\__init__.py" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Resources\Images\Player\" />
+    <Folder Include="Resources\Images\Player\Character\" />
     <Folder Include="Resources\Sounds\" />
     <Folder Include="Resources\Sounds\Effects\" />
     <Folder Include="Resources\Sounds\Songs\" />
@@ -41,6 +44,18 @@
     <Folder Include="Resources\Images\Omega Flowey\Stalks\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Resources\Images\Player\Character\player_down2.png" />
+    <Content Include="Resources\Images\Player\Character\player_down3.png" />
+    <Content Include="Resources\Images\Player\Character\player_down4.png" />
+    <Content Include="Resources\Images\Player\Character\player_down1.png" />
+    <Content Include="Resources\Images\Player\Character\player_left1.png" />
+    <Content Include="Resources\Images\Player\Character\player_left2.png" />
+    <Content Include="Resources\Images\Player\Character\player_right1.png" />
+    <Content Include="Resources\Images\Player\Character\player_right2.png" />
+    <Content Include="Resources\Images\Player\Character\player_up2.png" />
+    <Content Include="Resources\Images\Player\Character\player_up3.png" />
+    <Content Include="Resources\Images\Player\Character\player_up4.png" />
+    <Content Include="Resources\Images\Player\Character\player_up1.png" />
     <Content Include="Resources\Sounds\Effects\flowey_intense.wav" />
     <Content Include="Resources\Sounds\Effects\flowey_normal.wav" />
     <Content Include="Resources\Sounds\Songs\frozen_story.wav" />

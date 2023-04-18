@@ -270,6 +270,17 @@ class animation:
 
 class predef_spritesheets:
     def __init__(self, screen: pygame.Surface) -> None:
+        self.PLAYER_PATH = "Resources/Images/Player/"
+
+        self.PLAYER_DOWN_SPRITESHEET = spritesheet(screen, self.PLAYER_PATH + "Character", "player_down", 4, ".png")
+        self.PLAYER_UP_SPRITESHEET = spritesheet(screen, self.PLAYER_PATH + "Character", "player_up", 4, ".png")
+        self.PLAYER_LEFT_SPRITESHEET = spritesheet(screen, self.PLAYER_PATH + "Character", "player_left", 2, ".png")
+        self.PLAYER_RIGHT_SPRITESHEET = spritesheet(screen, self.PLAYER_PATH + "Character", "player_right", 2, ".png")
+        self.PLAYER_DOWN_ANIMATION = animation(self.PLAYER_DOWN_SPRITESHEET.get_sprites(), 0)
+        self.PLAYER_UP_ANIMATION = animation(self.PLAYER_UP_SPRITESHEET.get_sprites(), 0)
+        self.PLAYER_LEFT_ANIMATION = animation(self.PLAYER_LEFT_SPRITESHEET.get_sprites(), 0)
+        self.PLAYER_RIGHT_ANIMATION = animation(self.PLAYER_RIGHT_SPRITESHEET.get_sprites(), 0)
+
         self.UNDERTALE_FONT_SPRITESHEET = spritesheet(screen, "Resources/Images/Fonts/Undertale/", "", 94, ".png").resize_images(0.5)
         self.UNDERTALE_FONT_ANIMATION = animation(self.UNDERTALE_FONT_SPRITESHEET.get_sprites(), 0)
 
