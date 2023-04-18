@@ -14,10 +14,14 @@ class story_board:
         #The variables below are to assist in proceeding the story in a flow.
         #It may look like a complicated mess, but there's a method to the madness.
 
+        #Checks if the "Z" key is currently held.
+        self.z_held = True
         #Whether or not the game is on the screen to choose "Continue" or "Restart"
         self.continue_or_restart_time = False
         #True if "Continue" is highlighted and False if "Restart" is highlighted.
         self.continue_or_restart = True
+        #Verifies the "Z" key is not pressed before checking if the "Z" key is pressed on the "Continue/Restart" screen.
+        self.continue_or_restart_prepared = False
         #Checks if the "Right" or "Left" button is currently held on the "Continue/Restart" screen.
         self.continue_or_restart_held = True
 
@@ -58,6 +62,8 @@ class story_board:
                 self.pause_loop = True
 
     def select_continue_or_restart(self) -> None:
+        self.z_held = self.story.keyboard.is_z()
+
         if self.continue_or_restart:
             self.normal_font.say("Flowey    LV9999    9999:99\nMy World\n\n                Restart", 100, 170, False, None, 0)
             self.yellow_font.say("   Continue", 100, 284, False, None, 0)
@@ -72,3 +78,21 @@ class story_board:
             if self.story.keyboard.is_right() or self.story.keyboard.is_left():
                 self.continue_or_restart = not self.continue_or_restart
                 self.continue_or_restart_held = True
+
+        if not self.continue_or_restart_prepared:
+            if self.z_held:
+                return
+
+            self.continue_or_restart_prepared = True
+
+            return
+
+        if self.z_held:
+            if not self.continue_or_restart:
+                self.continue_or_restart = True
+                self.continue_or_restart_prepared = False
+            else:
+                self.normal_font.clear()
+                self.yellow_font.clear()
+                self.continue_or_restart_time = False
+                self.window.run_event(0, 1)

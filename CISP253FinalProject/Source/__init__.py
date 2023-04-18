@@ -83,12 +83,14 @@ class window:
         pygame.display.flip()
 
     def run_event(self, story_number: int, event_number: int) -> None:
+        global SONGS
+
         if story_number == 0:
             if event_number == 0:
-                global SONGS
-
                 SONGS.STORY.stop()
                 SONGS.STORY_FROZEN.play(pitch = 0.84)
+            elif event_number == 1:
+                SONGS.STORY_FROZEN.stop()
 
 game = window("Undertale: Omega Flowey")
 game.run()
