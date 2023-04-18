@@ -42,6 +42,7 @@
   <ItemGroup>
     <Content Include="Resources\Sounds\Effects\flowey_intense.wav" />
     <Content Include="Resources\Sounds\Effects\flowey_normal.wav" />
+    <Content Include="Resources\Sounds\Songs\story.wav" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

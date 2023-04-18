@@ -3,14 +3,14 @@ from sprites import predef_spritesheets, SPRITESHEETS
 from entity import *
 from flowey import flowey
 from fonts import undertale_font, undertale_yellow_font
-from sound import predef_effects, EFFECTS
+from sound import predef_effects, predef_songs, EFFECTS, SONGS
 import pygame
 
 GLOBAL_SCREEN = None
 
 class window:
     def __init__(self, title: str) -> None:
-        global GLOBAL_SCREEN, SPRITESHEETS, EFFECTS
+        global GLOBAL_SCREEN, SPRITESHEETS, EFFECTS, SONGS
 
         pygame.init()
         pygame.mixer.init(channels = 4)
@@ -22,6 +22,7 @@ class window:
         GLOBAL_SCREEN = self.screen
         SPRITESHEETS = predef_spritesheets(self.screen)
         EFFECTS = predef_effects()
+        SONGS = predef_songs()
 
         self.running = False
         self.keyboard = keyboard()
@@ -42,6 +43,8 @@ class window:
         updates_per_second = 60
         tick = 0
 
+        SONGS.STORY.play(pitch = 0.9)
+
         while self.running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -51,8 +54,8 @@ class window:
 
             delta_time += self.clock.tick() / 1000.0
 
-            if tick == 60:
-                self.font.say("Howdy! It's me!\nFLOWEY the FLOWER.", 30, 300, False, None, 3)
+            if tick == 1:
+                self.font.say("Long ago, two races\nruled over Earth:\nHUMANS and MONSTERS.", 30, 300, False, None, 8)
 
             while delta_time >= 1.0 / updates_per_second:
                 self.update()
