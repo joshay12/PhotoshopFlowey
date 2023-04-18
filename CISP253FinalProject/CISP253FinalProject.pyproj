@@ -48,10 +48,10 @@
     <Content Include="Resources\Images\Player\Character\player_down3.png" />
     <Content Include="Resources\Images\Player\Character\player_down4.png" />
     <Content Include="Resources\Images\Player\Character\player_down1.png" />
-    <Content Include="Resources\Images\Player\Character\player_left1.png" />
     <Content Include="Resources\Images\Player\Character\player_left2.png" />
-    <Content Include="Resources\Images\Player\Character\player_right1.png" />
+    <Content Include="Resources\Images\Player\Character\player_left1.png" />
     <Content Include="Resources\Images\Player\Character\player_right2.png" />
+    <Content Include="Resources\Images\Player\Character\player_right1.png" />
     <Content Include="Resources\Images\Player\Character\player_up2.png" />
     <Content Include="Resources\Images\Player\Character\player_up3.png" />
     <Content Include="Resources\Images\Player\Character\player_up4.png" />

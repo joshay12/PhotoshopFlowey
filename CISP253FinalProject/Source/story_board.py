@@ -1,15 +1,17 @@
 from pygame import Surface
 from fonts import story
+from entity import entity_collection
 
 class story_board:
-    def __init__(self, story: story, window) -> None:
+    def __init__(self, story: story, entities: entity_collection, window) -> None:
+        self.story = story
+        self.entities = entities
+        self.window = window
         self.running = False
         self.pause_loop = False
         self.last_event = 0
-        self.story = story
         self.normal_font = story.undertale
         self.yellow_font = story.undertale_yellow
-        self.window = window
 
         #The variables below are to assist in proceeding the story in a flow.
         #It may look like a complicated mess, but there's a method to the madness.
@@ -35,6 +37,8 @@ class story_board:
             self.window.run_event(0, 1)
 
     def update(self) -> None:
+        self.entities.update()
+
         if self.running and not self.pause_loop:
             self.story.update()
             self.check_events()
@@ -46,6 +50,8 @@ class story_board:
             self.yellow_font.update()
 
     def render(self, screen: Surface) -> None:
+        self.entities.render(screen)
+
         if self.running and not self.pause_loop:
             self.story.render(screen)
 

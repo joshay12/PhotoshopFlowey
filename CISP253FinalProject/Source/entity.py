@@ -110,6 +110,30 @@ class entity_collection:
     def get(self, index: int) -> entity:
         return self.entities[index]
 
+    #Retrieves the first entity in the list.
+    def first(self) -> entity:
+        if len(self.entities) == 0:
+            raise Exception("You tried to get the first item of an empty list.")
+
+        return self.get(0)
+
+    #Retrieves the last entity in the list.
+    def last(self) -> entity:
+        if len(self.entities) == 0:
+            raise Exception("You tried to get the last item of an empty list.")
+
+        return self.get(self.size() - 1)
+
+    #Retrieves all entities with the class type provided.
+    def get_items_by_class(self, class_type: type) -> 'entity_collection':
+        output = entity_collection()
+
+        for item in self.entities:
+            if type(item) is class_type:
+                output.add(item)
+
+        return output
+
     #Gets the index of the entity provided. Returns -1 if none was found.
     def index_of(self, entity: entity) -> int:
         for i in range(len(self.entities)):
@@ -133,4 +157,5 @@ class entity_collection:
     #Renders all the entities.
     def render(self, screen: Surface) -> None:
         for entity in self.entities:
-            entity.render(screen)
+            if entity.visible:
+                entity.render(screen)

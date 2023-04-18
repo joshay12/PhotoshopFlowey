@@ -30,9 +30,9 @@ class window:
         self.keyboard = keyboard()
         self.clock = pygame.time.Clock()
         self.entities = entity_collection()
+        self.entities.add(character(640 // 2, 480 // 2, self.keyboard, SPRITESHEETS))
         self.flowey = flowey(SPRITESHEETS, 0, 0)
-        self.character = character(640 // 2, 480 // 2, self.keyboard, SPRITESHEETS)
-        self.board = story_board(story(SPRITESHEETS, self.keyboard), self)
+        self.board = story_board(story(SPRITESHEETS, self.keyboard), self.entities, self)
 
         self.flowey.visible = False
 
@@ -71,18 +71,16 @@ class window:
         pygame.quit()
 
     def update(self) -> None:
-        self.flowey.update()
-        self.entities.update()
+        #self.entities.update()
         self.board.update()
-        self.character.update()
+        self.flowey.update()
 
     def render(self) -> None:
         self.screen.fill((0, 0, 0))
 
-        self.entities.render(self.screen)
-        self.flowey.render(self.screen)
+        #self.entities.render(self.screen)
         self.board.render(self.screen)
-        self.character.render(self.screen)
+        self.flowey.render(self.screen)
 
         pygame.display.flip()
 
@@ -95,6 +93,8 @@ class window:
                 SONGS.STORY_FROZEN.play(pitch = 0.84)
             elif event_number == 1:
                 SONGS.STORY_FROZEN.stop()
+
+                self.entities.get_items_by_class(character).first().visible = True
 
 game = window("Undertale: Omega Flowey")
 game.run()
