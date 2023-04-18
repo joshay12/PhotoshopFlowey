@@ -27,6 +27,7 @@
     <Compile Include="Source\sound.py" />
     <Compile Include="Source\sprites.py" />
     <Compile Include="Source\input.py" />
+    <Compile Include="Source\story_board.py" />
     <Compile Include="Source\__init__.py" />
   </ItemGroup>
   <ItemGroup>
