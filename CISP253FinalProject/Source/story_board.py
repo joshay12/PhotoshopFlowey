@@ -1,6 +1,7 @@
 from pygame import Surface
+from sprites import predef_spritesheets
 from fonts import story
-from entity import entity_collection
+from entity import entity, entity_collection
 
 class story_board:
     def __init__(self, story: story, entities: entity_collection, window) -> None:
@@ -35,6 +36,7 @@ class story_board:
         elif skip == 1:
             self.pause_loop = True
             self.window.run_event(0, 1)
+            self.entities.remove(self.entities.get_items_by_class(intro_picture).first())
 
     def update(self) -> None:
         self.entities.update()
@@ -69,6 +71,7 @@ class story_board:
             if self.last_event == 1:
                 self.window.run_event(0, 0)
             elif self.last_event == 2:
+                self.entities.remove(self.entities.get_items_by_class(intro_picture).first())
                 self.continue_or_restart_time = True
                 self.pause_loop = True
 
@@ -107,3 +110,62 @@ class story_board:
                 self.yellow_font.clear()
                 self.continue_or_restart_time = False
                 self.window.run_event(0, 1)
+
+class intro_picture(entity):
+    def __init__(self, x: int, y: int, spritesheets: predef_spritesheets) -> None:
+        super().__init__(spritesheets.INTRO_SCREEN_ANIMATION, x, y, True, False)
+
+        self.x -= self.width / 2
+        self.y -= self.height / 2
+
+    def update(self) -> None:
+        pass
+
+    def render(self, screen: Surface) -> None:
+        screen.blit(self.get_sprite().image, self.get_data())
+
+class file_backdrop(entity):
+    def __init__(self, x: int, y: int, spritesheets: predef_spritesheets) -> None:
+        super().__init__(spritesheets.FILE_BACKDROP_ANIMATION, x, y, True, False)
+
+        self.font = None
+
+        self.x -= self.width / 2
+        self.y -= self.height / 2
+
+        self.origin_x = self.x
+        self.origin_y = self.y
+
+        self.layer = 1000
+
+    def hide(self) -> 'file_backdrop':
+        self.visible = False
+
+        return self
+
+    def show(self) -> 'file_backdrop':
+        self.visible = True
+
+        return self
+
+    def show_generated_font(self, name: str, font) -> None:
+        if self.font == None:
+            self.font = font
+
+        output = name.lower().split(" ")[0] + "   LV1    409:20\nThe End\n{p=20}   Save      Return"
+
+        self.font.say(output, 133, 110, False, None, 0)
+
+    def update(self) -> None:
+        self.x = self.origin_x
+        self.y = self.origin_y
+
+        if self.visible:
+            self.font.update()
+
+    def render(self, screen: Surface) -> None:
+        screen.blit(self.get_sprite().image, self.get_data())
+
+        if self.visible:
+            self.font.render(screen)
+

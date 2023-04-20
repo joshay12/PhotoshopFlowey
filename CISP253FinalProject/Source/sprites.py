@@ -270,6 +270,23 @@ class animation:
 
 class predef_spritesheets:
     def __init__(self, screen: pygame.Surface) -> None:
+        #Introduction Screen Animation
+        self.INTRO_SCREEN_SPRITESHEET = spritesheet(screen, "Resources/Images/Intro Screen", "image", 2, ".png")
+        self.INTRO_SCREEN_ANIMATION = animation(self.INTRO_SCREEN_SPRITESHEET.get_sprites(), 0)
+
+        #File Backdrop Animations
+        self.FILE_BACKDROP_PATH = "Resources/Images/File Backdrop/"
+
+        self.FILE_BACKDROP_SPRITESHEET = spritesheet(screen, self.FILE_BACKDROP_PATH, "file", 2, ".png")
+        self.FILE_BACKDROP_ANIMATION = animation(self.FILE_BACKDROP_SPRITESHEET.get_sprites(), 0)
+
+        self.FILE_CRACKS_SPRITESHEET = spritesheet(screen, self.FILE_BACKDROP_PATH, "cracks", 3, ".png")
+        self.FILE_CRACKS_ANIMATION = animation(self.FILE_CRACKS_SPRITESHEET.get_sprites(), 0)
+
+        self.FILE_SHATTERED_SPRITESHEET = spritesheet(screen, self.FILE_BACKDROP_PATH, "erased_shatter", 6, ".png")
+        self.FILE_SHATTERED_ANIMATION = animation(self.FILE_SHATTERED_SPRITESHEET.get_sprites(), 0)
+
+        #Player Animations
         self.PLAYER_PATH = "Resources/Images/Player/"
 
         self.PLAYER_DOWN_SPRITESHEET = spritesheet(screen, self.PLAYER_PATH + "Character", "player_down", 4, ".png")
@@ -281,6 +298,11 @@ class predef_spritesheets:
         self.PLAYER_LEFT_ANIMATION = animation(self.PLAYER_LEFT_SPRITESHEET.get_sprites(), 0)
         self.PLAYER_RIGHT_ANIMATION = animation(self.PLAYER_RIGHT_SPRITESHEET.get_sprites(), 0)
 
+        #Save Star Animation
+        self.SAVE_STAR_SPRITESHEET = spritesheet(screen, "Resources/Images/Save Star", "save", 2, ".png")
+        self.SAVE_STAR_ANIMATION = animation(self.SAVE_STAR_SPRITESHEET.get_sprites(), 10)
+
+        #Font Animations
         self.UNDERTALE_FONT_SPRITESHEET = spritesheet(screen, "Resources/Images/Fonts/Undertale/", "", 94, ".png").resize_images(0.5)
         self.UNDERTALE_FONT_ANIMATION = animation(self.UNDERTALE_FONT_SPRITESHEET.get_sprites(), 0)
 

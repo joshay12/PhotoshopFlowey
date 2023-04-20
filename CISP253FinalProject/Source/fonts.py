@@ -1,11 +1,12 @@
 from sprites import animation, predef_spritesheets
+from sound import predef_effects
 from input import keyboard
 from pygame import Surface
 from random import randint
 from sound import effect
 
 class story:
-	def __init__(self, spritesheets: predef_spritesheets, keyboard: keyboard) -> None:
+	def __init__(self, spritesheets: predef_spritesheets, effects: predef_effects, keyboard: keyboard) -> None:
 		self.undertale = undertale_font(spritesheets)
 		self.undertale_yellow = undertale_yellow_font(spritesheets)
 		self.keyboard = keyboard
@@ -22,11 +23,12 @@ class story:
 		#There are 60 ticks per second.
 		#For instant text, set the Speed to 0.
 		#To delay the text, use {d=<TICK_AMOUNT>} ("d" referencing "delay")
+		#To move the text up or down, use {p=<Y_POSITION_TO_MOVE>}
 
 		#Parameter usage: Font, Text, X, Y, Sound Effect, Speed, Shake, Delay, Auto Proceed, and Change Event.
-		self.pre_story_lines.append(line(self.undertale, "Long ago, two races\nruled over the Earth:\nHUMANS and MONSTERS{d=7}", 100, 100, None, 4, 0, 0, True, False))
-		self.pre_story_lines.append(line(self.undertale, "One day, the{d=3}", 100, 100, None, 4, 0, 0, True, False))
-		self.pre_story_lines.append(line(self.undertale, "One day, they all\ndisappeared without\na trace.{d=30}", 100, 100, None, 0, 0, 0, True, True))
+		self.pre_story_lines.append(line(self.undertale, "Long ago, two races\nruled over the Earth:\nHUMANS and MONSTERS{d=75}", 120, 325, None, 4, 0, 0, True, False))
+		self.pre_story_lines.append(line(self.undertale, "One day, the{d=30}", 120, 325, None, 4, 0, 0, True, False))
+		self.pre_story_lines.append(line(self.undertale, "One day, they all\ndisappeared without\na trace.{d=300}", 120, 325, None, 0, 0, 0, True, True))
 		self.pre_story_lines.append(clear_line(True))
 
 	def play(self, story: list) -> None:
@@ -201,7 +203,7 @@ class custom_font:
 					char = self.text[self.current]
 					index = self.allowed.find(char)
 
-					if self.check_special_instructions(char):
+					if self.check_special_instructions(char)[0]:
 						return
 
 					if index > -1:
@@ -227,11 +229,21 @@ class custom_font:
 
 					self.current += 1
 				elif self.speed <= 0:
-					for char in self.text:
+					skip_amount = 0
+
+					for i in range(len(self.text)):
+						char = self.text[i]
 						index = self.allowed.find(char)
 
-						if self.check_special_instructions(char):
-							return
+						cont, skip = self.check_special_instructions(char)
+
+						if cont or skip_amount > 0:
+							skip_amount -= 1
+
+							if skip > 0:
+								skip_amount += skip
+
+							continue
 
 						if index > -1:
 							self.letters.append(letter(self.animation.sprites[index].image, self.x, self.y, self.is_high(char), self.get_y_offset(char)))
@@ -253,8 +265,9 @@ class custom_font:
 				for item in self.letters:
 					item.random_shake()
 
-	def check_special_instructions(self, char: str) -> bool:
+	def check_special_instructions(self, char: str):
 		if char == '{':
+			output_i = 0
 			statement = ""
 
 			for i in range(len(self.text) - self.current):
@@ -262,6 +275,7 @@ class custom_font:
 
 				if self.text[self.current + i] == '}':
 					self.current += i + 1
+					output_i = i + 1
 					statement = statement[1:-1]
 
 					break
@@ -270,10 +284,14 @@ class custom_font:
 				statement = int(statement[2:])
 
 				self.extra_delay = statement
+			elif statement.startswith("p="):
+				statement = int(statement[2:])
 
-			return True
+				self.y += statement
 
-		return False
+			return True, output_i
+
+		return False, 0
 
 	def clear(self) -> None:
 		self.images = []

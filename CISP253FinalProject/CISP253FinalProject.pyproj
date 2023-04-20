@@ -32,6 +32,9 @@
     <Compile Include="Source\__init__.py" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Resources\Images\Intro Screen\" />
+    <Folder Include="Resources\Images\File Backdrop\" />
+    <Folder Include="Resources\Images\Save Star\" />
     <Folder Include="Resources\Images\Player\" />
     <Folder Include="Resources\Images\Player\Character\" />
     <Folder Include="Resources\Sounds\" />
@@ -44,6 +47,19 @@
     <Folder Include="Resources\Images\Omega Flowey\Stalks\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Resources\Images\File Backdrop\cracks1.png" />
+    <Content Include="Resources\Images\File Backdrop\cracks2.png" />
+    <Content Include="Resources\Images\File Backdrop\cracks3.png" />
+    <Content Include="Resources\Images\File Backdrop\erased_shatter1.png" />
+    <Content Include="Resources\Images\File Backdrop\erased_shatter2.png" />
+    <Content Include="Resources\Images\File Backdrop\erased_shatter3.png" />
+    <Content Include="Resources\Images\File Backdrop\erased_shatter4.png" />
+    <Content Include="Resources\Images\File Backdrop\erased_shatter5.png" />
+    <Content Include="Resources\Images\File Backdrop\erased_shatter6.png" />
+    <Content Include="Resources\Images\File Backdrop\file1.png" />
+    <Content Include="Resources\Images\File Backdrop\file2.png" />
+    <Content Include="Resources\Images\Intro Screen\image2.png" />
+    <Content Include="Resources\Images\Intro Screen\image1.png" />
     <Content Include="Resources\Images\Player\Character\player_down2.png" />
     <Content Include="Resources\Images\Player\Character\player_down3.png" />
     <Content Include="Resources\Images\Player\Character\player_down4.png" />
@@ -56,8 +72,11 @@
     <Content Include="Resources\Images\Player\Character\player_up3.png" />
     <Content Include="Resources\Images\Player\Character\player_up4.png" />
     <Content Include="Resources\Images\Player\Character\player_up1.png" />
+    <Content Include="Resources\Images\Save Star\save1.png" />
+    <Content Include="Resources\Images\Save Star\save2.png" />
     <Content Include="Resources\Sounds\Effects\flowey_intense.wav" />
     <Content Include="Resources\Sounds\Effects\flowey_normal.wav" />
+    <Content Include="Resources\Sounds\Effects\heal.wav" />
     <Content Include="Resources\Sounds\Songs\frozen_story.wav" />
     <Content Include="Resources\Sounds\Songs\story.wav" />
   </ItemGroup>

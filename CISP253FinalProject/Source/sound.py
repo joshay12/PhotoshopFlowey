@@ -100,3 +100,4 @@ class predef_effects:
 
         self.FLOWEY_TALK_NORMAL = effect(location, "flowey_normal")
         self.FLOWEY_TALK_INTENSE = effect(location, "flowey_intense")
+        self.HEAL = effect(location, "heal")
