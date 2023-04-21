@@ -1,8 +1,10 @@
 from pygame import Surface
+from player import save_star
 from sprites import predef_spritesheets
 from sound import predef_effects
 from fonts import story
 from entity import entity, entity_collection
+from random import randint
 
 class story_board:
     def __init__(self, story: story, entities: entity_collection, window) -> None:
@@ -38,6 +40,13 @@ class story_board:
             self.pause_loop = True
             self.window.run_event(0, 1)
             self.entities.remove(self.entities.get_items_by_class(intro_picture).first())
+        elif skip == 2:
+            self.pause_loop = True
+            self.window.run_event(0, 1)
+            self.window.run_event(0, 2)
+            self.window.run_event(0, 3)
+            self.entities.remove(self.entities.get_items_by_class(intro_picture).first())
+            self.entities.remove(self.entities.get_items_by_class(save_star).first())
 
     def update(self) -> None:
         self.entities.update()
@@ -126,9 +135,10 @@ class intro_picture(entity):
         screen.blit(self.get_sprite().image, self.get_data())
 
 class file_backdrop(entity):
-    def __init__(self, x: int, y: int, spritesheets: predef_spritesheets, effects: predef_effects) -> None:
+    def __init__(self, window, x: int, y: int, spritesheets: predef_spritesheets, effects: predef_effects) -> None:
         super().__init__(spritesheets.FILE_BACKDROP_ANIMATION, x, y, True, False)
 
+        self.window = window
         self.spritesheets = spritesheets
         self.effects = effects
 
@@ -223,7 +233,7 @@ class file_cracks(entity):
             self.animation.next()
             self.effects.PUNCH_SLOWER.play()
             self.origin_x += 2
-            self.owner.font.say("{c=True}", 0, 0, speed = 0)
+            self.owner.font.clear()
             self.owner.animation.next()
             self.my_screen.shake_screen(55, 4)
         elif self.tick == 180:
@@ -231,6 +241,50 @@ class file_cracks(entity):
             self.effects.PUNCH_SLOWEST.play()
             self.origin_x += 28
             self.my_screen.shake_screen(65, 4)
+        elif self.tick >= 330:
+            self.my_screen.shake_screen(80, 4)
+            self.owner.window.run_event(0, 3)
+
+        self.x = self.origin_x + self.my_screen.x
+        self.y = self.origin_y + self.my_screen.y
+
+    def render(self, screen: Surface) -> None:
+        screen.blit(self.get_sprite().image, self.get_data())
+
+class file_shattered(entity):
+    def __init__(self, owner: file_backdrop, x: int, y: int, shatter_number: int, spritesheets: predef_spritesheets) -> None:
+        super().__init__(spritesheets.FILE_SHATTERED_ANIMATION, x, y, True, True)
+
+        self.animation = self.animation.clear_all_but(shatter_number)
+
+        self.x += owner.x + owner.width / 2 - self.width / 2
+        self.y += owner.y + owner.height / 2 - self.height / 2
+
+        self.origin_x = self.x
+        self.origin_y = self.y
+
+        self.center_x = owner.x + owner.width / 2
+        self.center_y = owner.y
+        self.speed_x = -((640 / 2 - self.width / 2 - self.origin_x) / 12) + randint(-2, 2)
+        self.velocity_y = -((480 / 4 - self.height / 2 - self.origin_y) / 16) + randint(-3, 1)
+
+        self.layer = 1002
+
+    def hide(self) -> 'file_cracks':
+        self.visible = False
+
+        return self
+
+    def show(self) -> 'file_cracks':
+        self.visible = True
+
+        return self
+
+    def update(self) -> None:
+        self.velocity_y += 0.5
+
+        self.origin_x += self.speed_x
+        self.origin_y += self.velocity_y
 
         self.x = self.origin_x + self.my_screen.x
         self.y = self.origin_y + self.my_screen.y

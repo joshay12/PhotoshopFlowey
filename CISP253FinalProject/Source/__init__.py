@@ -2,9 +2,9 @@ from input import keyboard
 from sprites import predef_spritesheets, SPRITESHEETS
 from entity import *
 from flowey import flowey
-from fonts import story
+from fonts import story, fonts_init
 from sound import predef_effects, predef_songs, EFFECTS, SONGS
-from story_board import story_board, intro_picture, file_backdrop
+from story_board import story_board, intro_picture, file_backdrop, file_shattered
 from player import character, save_star
 from getpass import getuser
 import pygame, random
@@ -17,7 +17,7 @@ class window:
         global GLOBAL_SCREEN, MY_SCREEN, SPRITESHEETS, EFFECTS, SONGS
 
         pygame.init()
-        pygame.mixer.init(channels = 8)
+        pygame.mixer.init(channels = 10)
 
         self.title = title
         self.screen = pygame.display.set_mode((640, 480))
@@ -27,6 +27,7 @@ class window:
         MY_SCREEN = my_screen()
 
         entity_init(MY_SCREEN)
+        fonts_init(MY_SCREEN)
 
         SPRITESHEETS = predef_spritesheets(self.screen)
         EFFECTS = predef_effects()
@@ -37,7 +38,7 @@ class window:
         self.clock = pygame.time.Clock()
         self.entities = entity_collection()
         self.entities.add(intro_picture(640 / 2, 480 / 3, SPRITESHEETS))
-        self.entities.add(file_backdrop(640 / 2, 150, SPRITESHEETS, EFFECTS).hide())
+        self.entities.add(file_backdrop(self, 640 / 2, 150, SPRITESHEETS, EFFECTS).hide())
         self.entities.add(character(self, 640 / 2, 480 - 480 / 3, self.screen.get_width(), self.screen.get_height(), self.keyboard, SPRITESHEETS))
         self.entities.add(save_star(640 / 2, -350, self.entities, SPRITESHEETS))
         self.entities.get_items_by_class(character).first().set_save_star(self.entities).set_heal_effect(EFFECTS.HEAL)
@@ -72,7 +73,7 @@ class window:
                 delta_time -= 1.0 / updates_per_second
 
             if not self.board.running:
-                self.board.begin(1) #INSERT NUMBER HERE TO SKIP TO CERTAIN PORTION OF STORY.
+                self.board.begin(2) #INSERT NUMBER HERE TO SKIP TO CERTAIN PORTION OF STORY.
 
             tick += 1
 
@@ -114,6 +115,24 @@ class window:
 
                 f_back.show_generated_font(getuser(), self.board.story.undertale)
                 f_back.show()
+            elif event_number == 3:
+                player = self.entities.get_items_by_class(character).first()
+
+                player.run_controls = False
+                player.animation = player.up
+
+                f_back = self.entities.get_items_by_class(file_backdrop).first()
+
+                EFFECTS.EXPLOSION.play()
+
+                self.entities.add(file_shattered(f_back, 109, 0, 0, SPRITESHEETS))
+                self.entities.add(file_shattered(f_back, -106, 0, 1, SPRITESHEETS))
+                self.entities.add(file_shattered(f_back, -25, -44, 2, SPRITESHEETS))
+                self.entities.add(file_shattered(f_back, -32, 42, 3, SPRITESHEETS))
+                self.entities.add(file_shattered(f_back, 62, -43, 4, SPRITESHEETS))
+                self.entities.add(file_shattered(f_back, 49, 42, 5, SPRITESHEETS))
+
+                self.entities.remove(f_back)
 
 class my_screen:
     def __init__(self) -> None:

@@ -5,6 +5,14 @@ from pygame import Surface
 from random import randint
 from sound import effect
 
+MY_SCREEN = None
+
+class fonts_init:
+	def __init__(self, my_screen) -> None:
+		global MY_SCREEN
+
+		MY_SCREEN = my_screen
+
 class story:
 	def __init__(self, spritesheets: predef_spritesheets, effects: predef_effects, keyboard: keyboard) -> None:
 		self.undertale = undertale_font(spritesheets)
@@ -265,6 +273,9 @@ class custom_font:
 				for item in self.letters:
 					item.random_shake()
 
+		for item in self.letters:
+			item.update()
+
 	def check_special_instructions(self, char: str):
 		if char == '{':
 			output_i = 0
@@ -294,20 +305,7 @@ class custom_font:
 		return False, 0
 
 	def clear(self) -> None:
-		self.origin_x = 0
-		self.x = 0
-		self.y = 0
-		self.text = ""
-		self.shake = False
-		self.speed = 0
-		self.extra_delay = 0
-		self.extra_tick = 0
-		self.current = 0
-		self.tick = 0
-		self.shake_tick = 0
-		self.letters = []
-		self.voice = None
-		self.complete = False
+		self.say("{c=True}", 0, 0, False, None, 0)
 
 	def render(self, screen: Surface):
 		for item in self.letters:
@@ -340,26 +338,34 @@ class undertale_yellow_font(custom_font):
 
 class letter:
 	def __init__(self, image: Surface, x: int, y: int, top_only: bool = False, y_offset: int = 0) -> None:
+		global MY_SCREEN
+
+		self.my_screen = MY_SCREEN
 		self.image = image
 		self.x = x
 		self.y = y
+		self.x_origin = self.x
+		self.y_origin = self.y
+		self.x_rand = 0
+		self.y_rand = 0
 		self.y_offset = y_offset
 		self.top_only = top_only
 		self.image_rect = self.image.get_rect()
-		self.image_rect.left = x
+		self.image_rect.left = self.x + self.my_screen.x
 
 		if self.top_only:
-			self.image_rect.top = y - self.image.get_height() + self.y_offset
+			self.image_rect.top = self.y + self.my_screen.y - self.image.get_height() + self.y_offset
 		else:
-			self.image_rect.bottom = y
+			self.image_rect.bottom = self.y + self.my_screen.y
 
 	def random_shake(self, x_limit: int = 1, y_limit: int = 1) -> None:
-		x_rand = randint(-x_limit, x_limit)
-		y_rand = randint(-y_limit, y_limit)
+		self.x_rand = randint(-x_limit, x_limit)
+		self.y_rand = randint(-y_limit, y_limit)
 
-		self.image_rect.left = self.x + x_rand
+	def update(self) -> None:
+		self.image_rect.left = self.x + self.x_rand + self.my_screen.x
 
 		if self.top_only:
-			self.image_rect.top = self.y + y_rand - self.image.get_height() + self.y_offset
+			self.image_rect.top = self.y + self.y_rand + self.my_screen.x - self.image.get_height() + self.y_offset
 		else:
-			self.image_rect.bottom = self.y + y_rand
+			self.image_rect.bottom = self.y + self.y_rand + self.my_screen.y
