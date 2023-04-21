@@ -3,11 +3,22 @@ from pygame import Rect, Surface
 from abc import abstractmethod
 from math import sqrt
 
+MY_SCREEN = None
+
+class entity_init:
+    def __init__(self, my_screen) -> None:
+        global MY_SCREEN
+
+        MY_SCREEN = my_screen
+
 #This is an abstract class dedicated to making entities and having them function properly.
 class entity:
     #This constructor requires the animation associated with the entity (even if there is only 1 sprite in it).
     #The x and y are optional to set, but can determine where you'd like the entity to appear on the screen.
     def __init__(self, animation: animation, x: float = 0.0, y: float = 0.0, force_center: bool = False, force_copy: bool = True) -> None:
+        global MY_SCREEN
+
+        self.my_screen = MY_SCREEN
         self.animation = animation.copy() if force_copy else animation
         self.x = x
         self.y = y

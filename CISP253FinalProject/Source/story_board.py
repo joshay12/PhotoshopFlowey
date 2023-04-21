@@ -1,5 +1,6 @@
 from pygame import Surface
 from sprites import predef_spritesheets
+from sound import predef_effects
 from fonts import story
 from entity import entity, entity_collection
 
@@ -125,8 +126,11 @@ class intro_picture(entity):
         screen.blit(self.get_sprite().image, self.get_data())
 
 class file_backdrop(entity):
-    def __init__(self, x: int, y: int, spritesheets: predef_spritesheets) -> None:
+    def __init__(self, x: int, y: int, spritesheets: predef_spritesheets, effects: predef_effects) -> None:
         super().__init__(spritesheets.FILE_BACKDROP_ANIMATION, x, y, True, False)
+
+        self.spritesheets = spritesheets
+        self.effects = effects
 
         self.font = None
 
@@ -137,6 +141,8 @@ class file_backdrop(entity):
         self.origin_y = self.y
 
         self.layer = 1000
+        self.tick = 0
+        self.cracks = None
 
     def hide(self) -> 'file_backdrop':
         self.visible = False
@@ -157,11 +163,19 @@ class file_backdrop(entity):
         self.font.say(output, 133, 110, False, None, 0)
 
     def update(self) -> None:
-        self.x = self.origin_x
-        self.y = self.origin_y
+        self.x = self.origin_x + self.my_screen.x
+        self.y = self.origin_y + self.my_screen.y
 
         if self.visible:
             self.font.update()
+            self.tick += 1
+
+            if self.tick == 180:
+                self.cracks = file_cracks(self, self.x, self.y, self.spritesheets, self.effects)
+                self.my_screen.shake_screen(50, 4)
+
+            if self.cracks != None:
+                self.cracks.update()
 
     def render(self, screen: Surface) -> None:
         screen.blit(self.get_sprite().image, self.get_data())
@@ -169,3 +183,57 @@ class file_backdrop(entity):
         if self.visible:
             self.font.render(screen)
 
+            if self.cracks != None:
+                self.cracks.render(screen)
+
+class file_cracks(entity):
+    def __init__(self, owner: file_backdrop, x: int, y: int, spritesheets: predef_spritesheets, effects: predef_effects) -> None:
+        super().__init__(spritesheets.FILE_CRACKS_ANIMATION, x, y, True, False)
+
+        self.owner = owner
+        self.effects = effects
+
+        self.x -= self.width / 2
+        self.y -= self.height / 2
+        self.x += self.owner.width / 2
+        self.y += self.owner.height / 2
+
+        self.origin_x = self.x
+        self.origin_y = self.y
+
+        self.layer = 1001
+        self.tick = 0
+
+        effects.PUNCH.play()
+
+    def hide(self) -> 'file_cracks':
+        self.visible = False
+
+        return self
+
+    def show(self) -> 'file_cracks':
+        self.visible = True
+
+        return self
+
+    def update(self) -> None:
+        self.tick += 1
+
+        if self.tick == 90:
+            self.animation.next()
+            self.effects.PUNCH_SLOWER.play()
+            self.origin_x += 2
+            self.owner.font.say("{c=True}", 0, 0, speed = 0)
+            self.owner.animation.next()
+            self.my_screen.shake_screen(55, 4)
+        elif self.tick == 180:
+            self.animation.next()
+            self.effects.PUNCH_SLOWEST.play()
+            self.origin_x += 28
+            self.my_screen.shake_screen(65, 4)
+
+        self.x = self.origin_x + self.my_screen.x
+        self.y = self.origin_y + self.my_screen.y
+
+    def render(self, screen: Surface) -> None:
+        screen.blit(self.get_sprite().image, self.get_data())

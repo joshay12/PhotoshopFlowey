@@ -74,9 +74,11 @@
     <Content Include="Resources\Images\Player\Character\player_up1.png" />
     <Content Include="Resources\Images\Save Star\save1.png" />
     <Content Include="Resources\Images\Save Star\save2.png" />
+    <Content Include="Resources\Sounds\Effects\explosion.wav" />
     <Content Include="Resources\Sounds\Effects\flowey_intense.wav" />
     <Content Include="Resources\Sounds\Effects\flowey_normal.wav" />
     <Content Include="Resources\Sounds\Effects\heal.wav" />
+    <Content Include="Resources\Sounds\Effects\punch.wav" />
     <Content Include="Resources\Sounds\Songs\frozen_story.wav" />
     <Content Include="Resources\Sounds\Songs\story.wav" />
   </ItemGroup>

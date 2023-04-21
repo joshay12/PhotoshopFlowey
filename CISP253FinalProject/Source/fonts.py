@@ -212,7 +212,7 @@ class custom_font:
 						if self.voice != None:
 							self.voice.play()
 
-					self.x += 17
+					self.x += 16
 
 					if char == '\n':
 						self.x = self.origin_x
@@ -248,7 +248,7 @@ class custom_font:
 						if index > -1:
 							self.letters.append(letter(self.animation.sprites[index].image, self.x, self.y, self.is_high(char), self.get_y_offset(char)))
 
-						self.x += 17
+						self.x += 16
 
 						if char == '\n':
 							self.x = self.origin_x
@@ -294,7 +294,20 @@ class custom_font:
 		return False, 0
 
 	def clear(self) -> None:
-		self.images = []
+		self.origin_x = 0
+		self.x = 0
+		self.y = 0
+		self.text = ""
+		self.shake = False
+		self.speed = 0
+		self.extra_delay = 0
+		self.extra_tick = 0
+		self.current = 0
+		self.tick = 0
+		self.shake_tick = 0
+		self.letters = []
+		self.voice = None
+		self.complete = False
 
 	def render(self, screen: Surface):
 		for item in self.letters:

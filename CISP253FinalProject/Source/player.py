@@ -41,6 +41,8 @@ class character(entity):
         self.z_prepared = False
         self.x -= self.width / 2
         self.y -= self.height / 2
+        self.origin_x = self.x
+        self.origin_y = self.y
         self.layer = 2
 
     def set_save_star(self, entities: entity_collection) -> 'character':
@@ -58,7 +60,13 @@ class character(entity):
         if not self.visible or not self.run_controls:
             self.animation.set_current(0)
 
+            self.x = self.origin_x + self.my_screen.x
+            self.y = self.origin_y + self.my_screen.y
+
             return
+
+        self.origin_x = self.x
+        self.origin_y = self.y
 
         self.animation.update()
 
@@ -152,6 +160,9 @@ class character(entity):
             self.y = self.screen_height - self.height
         elif self.y < 0:
             self.y = 0
+
+        self.origin_x = self.x
+        self.origin_y = self.y
 
     def render(self, screen: Surface) -> None:
         screen.blit(self.get_sprite().image, self.get_data())

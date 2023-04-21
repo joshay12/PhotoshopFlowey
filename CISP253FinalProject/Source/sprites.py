@@ -6,7 +6,7 @@ SPRITESHEETS = None
 #A spritesheet class dedicated to handling more than one image and spliting them up amongst sprites.
 class spritesheet:
     #The constructor needs the path of the image(s), the name of the image(s), and the amount of items to loop through.
-    def __init__(self, screen: pygame.Surface, path: str, name: str, amount: int = 1, extension: str = ".bmp") -> None:
+    def __init__(self, screen: pygame.Surface, path: str, name: str, amount: int = 1, extension: str = ".png") -> None:
         #Set up the class with its path, name, and amount properties.
         self.path = path
         self.name = name
@@ -271,52 +271,48 @@ class animation:
 class predef_spritesheets:
     def __init__(self, screen: pygame.Surface) -> None:
         #Introduction Screen Animation
-        self.INTRO_SCREEN_SPRITESHEET = spritesheet(screen, "Resources/Images/Intro Screen", "image", 2, ".png")
+        self.INTRO_SCREEN_SPRITESHEET = spritesheet(screen, "Resources/Images/Intro Screen", "image", 2)
         self.INTRO_SCREEN_ANIMATION = animation(self.INTRO_SCREEN_SPRITESHEET.get_sprites(), 0)
 
         #File Backdrop Animations
         self.FILE_BACKDROP_PATH = "Resources/Images/File Backdrop/"
 
-        self.FILE_BACKDROP_SPRITESHEET = spritesheet(screen, self.FILE_BACKDROP_PATH, "file", 2, ".png")
+        self.FILE_BACKDROP_SPRITESHEET = spritesheet(screen, self.FILE_BACKDROP_PATH, "file", 2)
         self.FILE_BACKDROP_ANIMATION = animation(self.FILE_BACKDROP_SPRITESHEET.get_sprites(), 0)
 
-        self.FILE_CRACKS_SPRITESHEET = spritesheet(screen, self.FILE_BACKDROP_PATH, "cracks", 3, ".png")
+        self.FILE_CRACKS_SPRITESHEET = spritesheet(screen, self.FILE_BACKDROP_PATH, "cracks", 3)
         self.FILE_CRACKS_ANIMATION = animation(self.FILE_CRACKS_SPRITESHEET.get_sprites(), 0)
 
-        self.FILE_SHATTERED_SPRITESHEET = spritesheet(screen, self.FILE_BACKDROP_PATH, "erased_shatter", 6, ".png")
+        self.FILE_SHATTERED_SPRITESHEET = spritesheet(screen, self.FILE_BACKDROP_PATH, "erased_shatter", 6)
         self.FILE_SHATTERED_ANIMATION = animation(self.FILE_SHATTERED_SPRITESHEET.get_sprites(), 0)
 
         #Player Animations
         self.PLAYER_PATH = "Resources/Images/Player/"
 
-        self.PLAYER_DOWN_SPRITESHEET = spritesheet(screen, self.PLAYER_PATH + "Character", "player_down", 4, ".png")
-        self.PLAYER_UP_SPRITESHEET = spritesheet(screen, self.PLAYER_PATH + "Character", "player_up", 4, ".png")
-        self.PLAYER_LEFT_SPRITESHEET = spritesheet(screen, self.PLAYER_PATH + "Character", "player_left", 2, ".png")
-        self.PLAYER_RIGHT_SPRITESHEET = spritesheet(screen, self.PLAYER_PATH + "Character", "player_right", 2, ".png")
+        self.PLAYER_DOWN_SPRITESHEET = spritesheet(screen, self.PLAYER_PATH + "Character", "player_down", 4)
+        self.PLAYER_UP_SPRITESHEET = spritesheet(screen, self.PLAYER_PATH + "Character", "player_up", 4)
+        self.PLAYER_LEFT_SPRITESHEET = spritesheet(screen, self.PLAYER_PATH + "Character", "player_left", 2)
+        self.PLAYER_RIGHT_SPRITESHEET = spritesheet(screen, self.PLAYER_PATH + "Character", "player_right", 2)
         self.PLAYER_DOWN_ANIMATION = animation(self.PLAYER_DOWN_SPRITESHEET.get_sprites(), 0)
         self.PLAYER_UP_ANIMATION = animation(self.PLAYER_UP_SPRITESHEET.get_sprites(), 0)
         self.PLAYER_LEFT_ANIMATION = animation(self.PLAYER_LEFT_SPRITESHEET.get_sprites(), 0)
         self.PLAYER_RIGHT_ANIMATION = animation(self.PLAYER_RIGHT_SPRITESHEET.get_sprites(), 0)
 
         #Save Star Animation
-        self.SAVE_STAR_SPRITESHEET = spritesheet(screen, "Resources/Images/Save Star", "save", 2, ".png")
+        self.SAVE_STAR_SPRITESHEET = spritesheet(screen, "Resources/Images/Save Star", "save", 2)
         self.SAVE_STAR_ANIMATION = animation(self.SAVE_STAR_SPRITESHEET.get_sprites(), 10)
 
         #Font Animations
-        self.UNDERTALE_FONT_SPRITESHEET = spritesheet(screen, "Resources/Images/Fonts/Undertale/", "", 94, ".png").resize_images(0.5)
+        self.UNDERTALE_FONT_SPRITESHEET = spritesheet(screen, "Resources/Images/Fonts/Undertale/", "", 94).resize_images(0.5)
         self.UNDERTALE_FONT_ANIMATION = animation(self.UNDERTALE_FONT_SPRITESHEET.get_sprites(), 0)
 
-        self.UNDERTALE_YELLOW_FONT_SPRITESHEET = spritesheet(screen, "Resources/Images/Fonts/UndertaleYellow/", "", 21, ".png").resize_images(0.5)
+        self.UNDERTALE_YELLOW_FONT_SPRITESHEET = spritesheet(screen, "Resources/Images/Fonts/UndertaleYellow/", "", 21).resize_images(0.5)
         self.UNDERTALE_YELLOW_FONT_ANIMATION = animation(self.UNDERTALE_YELLOW_FONT_SPRITESHEET.get_sprites(), 0)
 
         self.FLOWEY_PATH = "Resources/Images/Omega Flowey/"
 
-        #SCREEN ANIMATION
-        self.SCREEN_SPRITESHEET = spritesheet(screen, "Resources/Images/Filters/", "screen", 1)
-        self.SCREEN_ANIMATION = animation(self.SCREEN_SPRITESHEET.get_sprites(), 0)
-
         #BACKGROUND ANIMATION
-        self.BACKGROUND_SPRITESHEET = spritesheet(screen, self.FLOWEY_PATH + "Misc", "Backdrop", 1)
+        self.BACKGROUND_SPRITESHEET = spritesheet(screen, self.FLOWEY_PATH + "Misc", "backdrop", 1)
         self.BACKGROUND_ANIMATION = animation(self.BACKGROUND_SPRITESHEET.get_sprites(), 0)
 
         #STALKS ANIMATION
@@ -325,23 +321,23 @@ class predef_spritesheets:
         self.STALKS_ANIMATION_RIGHT = self.STALKS_ANIMATION_LEFT.flip_all_horizontally()
 
         #ORGANS ANIMATION
-        self.ORGANS_SPRITESHEET = spritesheet(screen, self.FLOWEY_PATH + "Misc", "Organs", 1).resize_images(0.6)
+        self.ORGANS_SPRITESHEET = spritesheet(screen, self.FLOWEY_PATH + "Misc", "organs", 1).resize_images(0.6)
         self.ORGANS_ANIMATION_LEFT = animation(self.ORGANS_SPRITESHEET.get_sprites(), 0)
         self.ORGANS_ANIMATION_RIGHT = self.ORGANS_ANIMATION_LEFT.flip_all_horizontally()
 
         #HANDS ANIMATION
-        self.HANDS_SPRITESHEET = spritesheet(screen, self.FLOWEY_PATH + "Hands", "Hand", 1).resize_images(0.5)
+        self.HANDS_SPRITESHEET = spritesheet(screen, self.FLOWEY_PATH + "Hands", "hand", 1).resize_images(0.5)
         self.HANDS_ANIMATION_LEFT = animation(self.HANDS_SPRITESHEET.get_sprites(), 0)
         self.HANDS_ANIMATION_RIGHT = self.HANDS_ANIMATION_LEFT.flip_all_horizontally()
 
         #VINES ANIMATION
-        self.VINES_1_SPRITESHEET = spritesheet(screen, self.FLOWEY_PATH + "Misc", "Vine1-", 1).resize_images(0.5)
+        self.VINES_1_SPRITESHEET = spritesheet(screen, self.FLOWEY_PATH + "Misc", "vine1-", 1).resize_images(0.5)
         self.VINES_1_ANIMATION_LEFT = animation(self.VINES_1_SPRITESHEET.get_sprites(), 0)
         self.VINES_1_ANIMATION_RIGHT = self.VINES_1_ANIMATION_LEFT.flip_all_horizontally()
-        self.VINES_2_SPRITESHEET = spritesheet(screen, self.FLOWEY_PATH + "Misc", "Vine2-", 1).resize_images(0.5)
+        self.VINES_2_SPRITESHEET = spritesheet(screen, self.FLOWEY_PATH + "Misc", "vine2-", 1).resize_images(0.5)
         self.VINES_2_ANIMATION_LEFT = animation(self.VINES_2_SPRITESHEET.get_sprites(), 0)
         self.VINES_2_ANIMATION_RIGHT = self.VINES_2_ANIMATION_LEFT.flip_all_horizontally()
-        self.VINES_3_SPRITESHEET = spritesheet(screen, self.FLOWEY_PATH + "Misc", "Vine3-", 1).resize_images(0.5)
+        self.VINES_3_SPRITESHEET = spritesheet(screen, self.FLOWEY_PATH + "Misc", "vine3-", 1).resize_images(0.5)
         self.VINES_3_ANIMATION_LEFT = animation(self.VINES_3_SPRITESHEET.get_sprites(), 0)
         self.VINES_3_ANIMATION_RIGHT = self.VINES_3_ANIMATION_LEFT.flip_all_horizontally()
 
@@ -350,32 +346,32 @@ class predef_spritesheets:
         self.TV_ANIMATION = animation(self.TV_SPRITESHEET.get_sprites(), 0)
 
         #FULL HEAD ANIMATION
-        self.HEAD_SPRITESHEET = spritesheet(screen, self.FLOWEY_PATH + "Head", "Head", 10).resize_images(0.5)
+        self.HEAD_SPRITESHEET = spritesheet(screen, self.FLOWEY_PATH + "Head", "head", 10).resize_images(0.5)
         self.HEAD_ANIMATION = animation(self.HEAD_SPRITESHEET.get_sprites(), 0)
 
         #EYE SOCKET ANIMATION
-        self.EYE_SOCKET_SPRITESHEET_LEFT = spritesheet(screen, self.FLOWEY_PATH + "Eyes", "EyeSocketLeft", 1).resize_images(0.5)
-        self.EYE_SOCKET_SPRITESHEET_RIGHT = spritesheet(screen, self.FLOWEY_PATH + "Eyes", "EyeSocketRight", 1).resize_images(0.5)
+        self.EYE_SOCKET_SPRITESHEET_LEFT = spritesheet(screen, self.FLOWEY_PATH + "Eyes", "eye_socket_left", 1).resize_images(0.5)
+        self.EYE_SOCKET_SPRITESHEET_RIGHT = spritesheet(screen, self.FLOWEY_PATH + "Eyes", "eye_socket_right", 1).resize_images(0.5)
         self.EYE_SOCKET_ANIMATION_LEFT = animation(self.EYE_SOCKET_SPRITESHEET_LEFT.get_sprites(), 0)
         self.EYE_SOCKET_ANIMATION_RIGHT = animation(self.EYE_SOCKET_SPRITESHEET_RIGHT.get_sprites(), 0)
 
         #SIDE EYE ANIMATION
-        self.EYE_SPRITESHEET_LEFT = spritesheet(screen, self.FLOWEY_PATH + "Eyes", "EyeLeft", 1).resize_images(0.5)
-        self.EYE_SPRITESHEET_RIGHT = spritesheet(screen, self.FLOWEY_PATH + "Eyes", "EyeRight", 1).resize_images(0.5)
+        self.EYE_SPRITESHEET_LEFT = spritesheet(screen, self.FLOWEY_PATH + "Eyes", "eye_left", 1).resize_images(0.5)
+        self.EYE_SPRITESHEET_RIGHT = spritesheet(screen, self.FLOWEY_PATH + "Eyes", "eye_right", 1).resize_images(0.5)
         self.EYE_ANIMATION_LEFT = animation(self.EYE_SPRITESHEET_LEFT.get_sprites(), 0)
         self.EYE_ANIMATION_RIGHT = animation(self.EYE_SPRITESHEET_RIGHT.get_sprites(), 0)
 
         #PUPIL ANIMATION
-        self.PUPIL_SPRITESHEET = spritesheet(screen, self.FLOWEY_PATH + "Eyes", "Pupil", 2)
+        self.PUPIL_SPRITESHEET = spritesheet(screen, self.FLOWEY_PATH + "Eyes", "pupil", 2)
         self.PUPIL_ANIMATION = animation(self.PUPIL_SPRITESHEET.get_sprites(), 0)
 
         #PIPE ANIMATION
-        self.PIPE_SPRITESHEET = spritesheet(screen, self.FLOWEY_PATH + "Misc", "Pipe", 1)
+        self.PIPE_SPRITESHEET = spritesheet(screen, self.FLOWEY_PATH + "Misc", "pipe", 1)
         self.PIPE_SPRITESHEET.make_rotated_images(2)
         self.PIPE_ANIMATION = animation(self.PIPE_SPRITESHEET.get_sprites(), 0)
 
         #TOP EYE ANIMATION
-        self.EYE_TOP_SPRITESHEET_LEFT = spritesheet(screen, self.FLOWEY_PATH + "Eyes", "EyeTopLeft", 1).resize_images(0.5)
-        self.EYE_TOP_SPRITESHEET_RIGHT = spritesheet(screen, self.FLOWEY_PATH + "Eyes", "EyeTopRight", 1).resize_images(0.5)
+        self.EYE_TOP_SPRITESHEET_LEFT = spritesheet(screen, self.FLOWEY_PATH + "Eyes", "eye_top_left", 1).resize_images(0.5)
+        self.EYE_TOP_SPRITESHEET_RIGHT = spritesheet(screen, self.FLOWEY_PATH + "Eyes", "eye_top_right", 1).resize_images(0.5)
         self.EYE_TOP_ANIMATION_LEFT = animation(self.EYE_TOP_SPRITESHEET_LEFT.get_sprites(), 0)
         self.EYE_TOP_ANIMATION_RIGHT = animation(self.EYE_TOP_SPRITESHEET_RIGHT.get_sprites(), 0)

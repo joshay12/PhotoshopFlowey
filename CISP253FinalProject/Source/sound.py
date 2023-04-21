@@ -5,7 +5,7 @@ SONGS = None
 EFFECTS = None
 
 class song:
-    def __init__(self, path: str, name: str, extension: str = ".wav") -> None:
+    def __init__(self, path: str, name: str, extension: str = ".ogg") -> None:
         self.sound = mixer.Sound(path + name + extension)
         self.channel = mixer.find_channel()
 
@@ -45,7 +45,7 @@ class song:
         return self
 
 class effect:
-    def __init__(self, path: str, name: str, extension: str = ".wav") -> None:
+    def __init__(self, path: str, name: str, extension: str = ".ogg") -> None:
         self.sound = mixer.Sound(path + name + extension)
         self.channel = mixer.find_channel()
 
@@ -101,3 +101,7 @@ class predef_effects:
         self.FLOWEY_TALK_NORMAL = effect(location, "flowey_normal")
         self.FLOWEY_TALK_INTENSE = effect(location, "flowey_intense")
         self.HEAL = effect(location, "heal")
+        self.PUNCH = effect(location, "punch")
+        self.PUNCH_SLOWER = effect(location, "punch_slower")
+        self.PUNCH_SLOWEST = effect(location, "punch_slowest")
+        self.EXPLOSION = effect(location, "explosion")
