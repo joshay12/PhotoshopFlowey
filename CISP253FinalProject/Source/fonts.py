@@ -25,6 +25,10 @@ class story:
 		self.stories_played = 0
 		self.play_new_line = False
 		self.pre_story_lines = []
+		self.pre_fight_story_before_first_snicker = []
+		self.pre_fight_story_before_second_snicker = []
+		self.pre_fight_story_before_walk = []
+		self.pre_fight_story_before_fight = []
 		self.current_line = None
 		self.story_finished = True
 
@@ -38,6 +42,52 @@ class story:
 		self.pre_story_lines.append(line(self.undertale, "One day, the{d=30}", 120, 325, None, 4, 0, 0, True, False))
 		self.pre_story_lines.append(line(self.undertale, "One day, they all\ndisappeared without\na trace.{d=300}", 120, 325, None, 0, 0, 0, True, True))
 		self.pre_story_lines.append(clear_line(True))
+
+		pre_fight_y_location = 275
+		pre_fight_speed = 3
+
+		self.pre_fight_story_before_first_snicker.append(line(self.undertale, "Howdy!", 120, pre_fight_y_location, effects.FLOWEY_TALK_NORMAL, pre_fight_speed, 0, 0, False, False))
+		self.pre_fight_story_before_first_snicker.append(line(self.undertale, "It's me, FLOWEY.", 120, pre_fight_y_location, effects.FLOWEY_TALK_NORMAL, pre_fight_speed, 0, 0, False, False))
+		self.pre_fight_story_before_first_snicker.append(line(self.undertale, "FLOWEY the FLOWER!", 120, pre_fight_y_location, effects.FLOWEY_TALK_NORMAL, pre_fight_speed, 0, 0, False, True))
+		self.pre_fight_story_before_first_snicker.append(line(self.undertale, "I owe you a HUGE thanks.", 120, pre_fight_y_location, effects.FLOWEY_TALK_NORMAL, pre_fight_speed, 0, 0, False, True))
+		self.pre_fight_story_before_first_snicker.append(line(self.undertale, "You really did a number\non that old fool.", 120, pre_fight_y_location, effects.FLOWEY_TALK_NORMAL, pre_fight_speed, 0, 0, False, True))
+		self.pre_fight_story_before_first_snicker.append(line(self.undertale, "Without you, I NEVER could\nhave gotten past him.", 120, pre_fight_y_location, effects.FLOWEY_TALK_NORMAL, pre_fight_speed, 0, 0, False, True))
+		self.pre_fight_story_before_first_snicker.append(line(self.undertale, "But now, with YOUR help...", 120, pre_fight_y_location, effects.FLOWEY_TALK_NORMAL, pre_fight_speed, 0, 0, False, True))
+		self.pre_fight_story_before_first_snicker.append(line(self.undertale, "He's DEAD.", 120, pre_fight_y_location, effects.FLOWEY_TALK_INTENSE, pre_fight_speed, 1, 0, False, True))
+		self.pre_fight_story_before_first_snicker.append(line(self.undertale, "And I'VE got the human\nSOULS!", 120, pre_fight_y_location, effects.FLOWEY_TALK_INTENSE, pre_fight_speed, 1, 0, False, True))
+		self.pre_fight_story_before_first_snicker.append(clear_line(True))
+
+		self.pre_fight_story_before_second_snicker.append(line(self.undertale, "Boy!", 120, pre_fight_y_location, effects.FLOWEY_TALK_NORMAL, pre_fight_speed, 0, 0, False, False))
+		self.pre_fight_story_before_second_snicker.append(line(self.undertale, "I've been empty for so\nlong...", 120, pre_fight_y_location, effects.FLOWEY_TALK_NORMAL, pre_fight_speed, 0, 0, False, False))
+		self.pre_fight_story_before_second_snicker.append(line(self.undertale, "It feels great to have a\nSOUL inside me again.", 120, pre_fight_y_location, effects.FLOWEY_TALK_NORMAL, pre_fight_speed, 0, 0, False, True))
+		self.pre_fight_story_before_second_snicker.append(line(self.undertale, "Mmmm, I can feel them\nwriggling...", 120, pre_fight_y_location, effects.FLOWEY_TALK_NORMAL, pre_fight_speed, 0, 0, False, True))
+		self.pre_fight_story_before_second_snicker.append(line(self.undertale, "Awww, you're feeling\nleft out, aren't you?", 120, pre_fight_y_location, effects.FLOWEY_TALK_NORMAL, pre_fight_speed, 0, 0, False, True))
+		self.pre_fight_story_before_second_snicker.append(line(self.undertale, "Well, that's just perfect.", 120, pre_fight_y_location, effects.FLOWEY_TALK_NORMAL, pre_fight_speed, 0, 0, False, True))
+		self.pre_fight_story_before_second_snicker.append(line(self.undertale, "After all, I only have\nsix souls.", 120, pre_fight_y_location, effects.FLOWEY_TALK_NORMAL, pre_fight_speed, 0, 0, False, True))
+		self.pre_fight_story_before_second_snicker.append(line(self.undertale, "I still need one more...", 120, pre_fight_y_location, effects.FLOWEY_TALK_NORMAL, pre_fight_speed, 0, 0, False, True))
+		self.pre_fight_story_before_second_snicker.append(line(self.undertale, "Before I become GOD.", 120, pre_fight_y_location, effects.FLOWEY_TALK_INTENSE, pre_fight_speed, 1, 0, False, True))
+		self.pre_fight_story_before_second_snicker.append(line(self.undertale, "And then, with my\nnewfound powers...", 120, pre_fight_y_location, effects.FLOWEY_TALK_INTENSE, pre_fight_speed, 1, 0, False, True))
+		self.pre_fight_story_before_second_snicker.append(line(self.undertale, "Monsters.", 120, pre_fight_y_location, effects.FLOWEY_TALK_INTENSE, pre_fight_speed, 1, 0, False, True))
+		self.pre_fight_story_before_second_snicker.append(line(self.undertale, "Humans.", 120, pre_fight_y_location, effects.FLOWEY_TALK_INTENSE, pre_fight_speed, 1, 0, False, True))
+		self.pre_fight_story_before_second_snicker.append(line(self.undertale, "Everyone.", 120, pre_fight_y_location, effects.FLOWEY_TALK_INTENSE, pre_fight_speed, 1, 0, False, True))
+		self.pre_fight_story_before_second_snicker.append(line(self.undertale, "I'll show them all the REAL\nmeaning of this world.", 120, pre_fight_y_location, effects.FLOWEY_TALK_INTENSE, pre_fight_speed, 1, 0, False, True))
+		self.pre_fight_story_before_second_snicker.append(clear_line(True))
+
+		self.pre_fight_story_before_walk.append(line(self.undertale, "Oh, and forget about escaping\nto your old SAVE FILE.", 120, pre_fight_y_location, effects.FLOWEY_TALK_NORMAL, pre_fight_speed, 0, 0, False, False))
+		self.pre_fight_story_before_walk.append(line(self.undertale, "It's gone FOREVER.", 120, pre_fight_y_location, effects.FLOWEY_TALK_INTENSE, pre_fight_speed, 1, 0, False, True))
+		self.pre_fight_story_before_walk.append(line(self.undertale, "But don't worry.", 120, pre_fight_y_location, effects.FLOWEY_TALK_NORMAL, pre_fight_speed, 0, 0, False, True))
+		self.pre_fight_story_before_walk.append(line(self.undertale, "Your old friend FLOWEY...", 120, pre_fight_y_location, effects.FLOWEY_TALK_NORMAL, pre_fight_speed, 0, 0, False, True))
+		self.pre_fight_story_before_walk.append(line(self.undertale, "Has worked out a replacement\nfor you!", 120, pre_fight_y_location, effects.FLOWEY_TALK_NORMAL, pre_fight_speed, 0, 0, False, True))
+		self.pre_fight_story_before_walk.append(line(self.undertale, "I'll SAVE over your own\ndeath.", 120, pre_fight_y_location, effects.FLOWEY_TALK_INTENSE, pre_fight_speed, 1, 0, False, True))
+		self.pre_fight_story_before_walk.append(line(self.undertale, "So you can watch me tear\nyou to bloody pieces...", 120, pre_fight_y_location, effects.FLOWEY_TALK_INTENSE, pre_fight_speed, 1, 0, False, True))
+		self.pre_fight_story_before_walk.append(line(self.undertale, "Over, and over, and over...", 120, pre_fight_y_location, effects.FLOWEY_TALK_INTENSE, pre_fight_speed, 1, 0, False, True))
+		self.pre_fight_story_before_walk.append(clear_line(True))
+
+		self.pre_fight_story_before_fight.append(line(self.undertale, "... what?", 120, pre_fight_y_location, effects.FLOWEY_TALK_INTENSE, pre_fight_speed, 1, 0, False, False))
+		self.pre_fight_story_before_fight.append(line(self.undertale, "Do you really think\nyou can stop ME?", 120, pre_fight_y_location, effects.FLOWEY_TALK_INTENSE, pre_fight_speed, 1, 0, False, False))
+		self.pre_fight_story_before_fight.append(line(self.undertale, "Hee hee hee...", 120, pre_fight_y_location, effects.FLOWEY_TALK_NORMAL, pre_fight_speed, 0, 0, False, True))
+		self.pre_fight_story_before_fight.append(line(self.undertale, "You really ARE an idiot.", 120, pre_fight_y_location, effects.FLOWEY_TALK_NORMAL, 8, 0, 0, False, True))
+		self.pre_fight_story_before_fight.append(clear_line(True))
 
 	def play(self, story: list) -> None:
 		self.stories_played += 1
@@ -230,8 +280,9 @@ class custom_font:
 						self.extra_delay = 10
 						self.extra_tick = 0
 					elif char == '.' or char == '!' or char == '?':
-						self.extra_delay = 15
-						self.extra_tick = 0
+						if self.current >= len(self.text) - 1 or self.text[self.current + 1] != '.':
+							self.extra_delay = 15
+							self.extra_tick = 0
 					else:
 						self.extra_delay = 0
 

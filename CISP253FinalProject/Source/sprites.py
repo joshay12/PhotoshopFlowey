@@ -309,6 +309,15 @@ class predef_spritesheets:
         self.UNDERTALE_YELLOW_FONT_SPRITESHEET = spritesheet(screen, "Resources/Images/Fonts/UndertaleYellow/", "", 21).resize_images(0.5)
         self.UNDERTALE_YELLOW_FONT_ANIMATION = animation(self.UNDERTALE_YELLOW_FONT_SPRITESHEET.get_sprites(), 0)
 
+        #TV Static Animations
+        self.STATIC_SPRITESHEET = spritesheet(screen, "Resources/Images/Static/", "static", 3)
+        self.STATIC_ANIMATION = animation(self.STATIC_SPRITESHEET.get_sprites(), 2)
+
+        #Flowey Animations
+        self.FLOWEY_SPRITESHEET = spritesheet(screen, "Resources/Images/Flowey/", "face", 27).resize_images(2.0)
+        self.FLOWEY_ANIMATION = animation(self.FLOWEY_SPRITESHEET.get_sprites(), 0)
+
+        #Omega Flowey Animations
         self.FLOWEY_PATH = "Resources/Images/Omega Flowey/"
 
         #BACKGROUND ANIMATION

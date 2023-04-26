@@ -38,12 +38,15 @@ class character(entity):
         self.screen_scroll = 0
         self.visible = False
         self.run_controls = True
+        self.move_to_bottom = False
+        self.move_up_slightly = False
         self.z_prepared = False
         self.x -= self.width / 2
         self.y -= self.height / 2
         self.origin_x = self.x
         self.origin_y = self.y
         self.layer = 2
+        self.ending_discussion_tick = 0
 
     def set_save_star(self, entities: entity_collection) -> 'character':
         self.entities = entities
@@ -62,6 +65,16 @@ class character(entity):
 
             self.x = self.origin_x + self.my_screen.x
             self.y = self.origin_y + self.my_screen.y
+
+            if self.move_up_slightly and self.origin_y > 335:
+                self.origin_y -= 5
+            elif self.move_up_slightly and self.origin_y <= 335:
+                self.ending_discussion_tick += 1
+            elif self.move_to_bottom and self.origin_y < 360 and not self.move_up_slightly:
+                self.origin_y += 8
+
+            if self.ending_discussion_tick == 60:
+                self.window.run_event(3, 8)
 
             return
 

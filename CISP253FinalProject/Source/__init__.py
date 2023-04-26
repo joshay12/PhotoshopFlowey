@@ -4,7 +4,7 @@ from entity import *
 from flowey import flowey
 from fonts import story, fonts_init
 from sound import predef_effects, predef_songs, EFFECTS, SONGS
-from story_board import story_board, intro_picture, file_backdrop, file_shattered
+from story_board import story_board, intro_picture, file_backdrop, file_shattered, flowey_head, flowey_static
 from player import character, save_star
 from getpass import getuser
 import pygame, random
@@ -17,7 +17,7 @@ class window:
         global GLOBAL_SCREEN, MY_SCREEN, SPRITESHEETS, EFFECTS, SONGS
 
         pygame.init()
-        pygame.mixer.init(channels = 10)
+        pygame.mixer.init(channels = 16)
 
         self.title = title
         self.screen = pygame.display.set_mode((640, 480))
@@ -33,6 +33,7 @@ class window:
         EFFECTS = predef_effects()
         SONGS = predef_songs()
 
+        self.f4 = False
         self.running = False
         self.keyboard = keyboard()
         self.clock = pygame.time.Clock()
@@ -88,6 +89,13 @@ class window:
         
         my_screen.update()
 
+        if self.keyboard.is_f4() and not self.f4:
+            pygame.display.toggle_fullscreen()
+
+            self.f4 = True
+        elif self.f4 and not self.keyboard.is_f4():
+            self.f4 = False
+
     def render(self) -> None:
         self.screen.fill((0, 0, 0))
 
@@ -98,7 +106,7 @@ class window:
         pygame.display.flip()
 
     def run_event(self, story_number: int, event_number: int) -> None:
-        global SONGS
+        global SONGS, EFFECTS
 
         if story_number == 0:
             if event_number == 0:
@@ -125,6 +133,8 @@ class window:
 
                 EFFECTS.EXPLOSION.play()
 
+                self.entities.add(flowey_head(self, 640 / 2, 150, SPRITESHEETS))
+                self.entities.add(flowey_static(self.entities.get_items_by_class(flowey_head).first(), EFFECTS, SPRITESHEETS))
                 self.entities.add(file_shattered(f_back, 109, 0, 0, SPRITESHEETS))
                 self.entities.add(file_shattered(f_back, -106, 0, 1, SPRITESHEETS))
                 self.entities.add(file_shattered(f_back, -25, -44, 2, SPRITESHEETS))
@@ -133,6 +143,137 @@ class window:
                 self.entities.add(file_shattered(f_back, 49, 42, 5, SPRITESHEETS))
 
                 self.entities.remove(f_back)
+        elif story_number == 1:
+            f_head = self.entities.get_items_by_class(flowey_head).first()
+            f_static = self.entities.get_items_by_class(flowey_static).first()
+            p_char = self.entities.get_items_by_class(character).first()
+
+            if event_number == 0:
+                f_head.hide()
+                f_static.force_static(0)
+                p_char.move_to_bottom = True
+            elif event_number == 1:
+                f_static.force_static(0)
+                f_static.attempt = True
+                f_head.shake = True
+                f_head.show()
+            elif event_number == 2:
+                SONGS.YOU_IDIOT.play()
+
+                self.board.story.play(self.board.story.pre_fight_story_before_first_snicker)
+                self.board.running = True
+                self.board.pause_loop = False
+            elif event_number == 3:
+                f_head.animation.set_current(1)
+            elif event_number == 4:
+                f_head.animation.set_current(0)
+            elif event_number == 5:
+                f_head.animation.set_current(2)
+            elif event_number == 6:
+                f_head.animation.set_current(0)
+            elif event_number == 7:
+                f_head.animation.set_current(3)
+            elif event_number == 8:
+                f_head.animation.set_current(4)
+            elif event_number == 9:
+                f_head.animation.set_current(5)
+            elif event_number == 10:
+                f_head.hide()
+                f_head.flowey_snicker(False)
+                f_static.force_static(1)
+                f_static.attempt = False
+        elif story_number == 2:
+            f_head = self.entities.get_items_by_class(flowey_head).first()
+            f_static = self.entities.get_items_by_class(flowey_static).first()
+
+            if event_number == 0:
+                EFFECTS.FLOWEY_CREEPY_LAUGH_NORMAL.play()
+            elif event_number == 1:
+                f_head.animation.set_current(0)
+                f_head.show()
+                f_static.force_static(1)
+                f_static.attempt = True
+            elif event_number == 2:
+                self.board.story.play(self.board.story.pre_fight_story_before_second_snicker)
+                self.board.running = True
+                self.board.pause_loop = False
+            elif event_number == 3:
+                f_head.animation.set_current(2)
+            elif event_number == 4:
+                f_head.animation.set_current(1)
+            elif event_number == 5:
+                f_head.animation.set_current(6)
+            elif event_number == 6:
+                f_head.animation.set_current(1)
+            elif event_number == 7:
+                f_head.animation.set_current(0)
+            elif event_number == 8:
+                f_head.animation.set_current(1)
+            elif event_number == 9:
+                f_head.animation.set_current(7)
+            elif event_number == 10:
+                f_head.animation.set_current(5)
+            elif event_number == 11:
+                f_head.animation.set_current(8)
+            elif event_number == 12:
+                f_head.animation.set_current(9)
+            elif event_number == 13:
+                f_head.animation.set_current(9)
+                f_head.animation.increment = 4
+            elif event_number == 14:
+                f_head.animation.set_current(19)
+                f_head.animation.increment = 0
+            elif event_number == 15:
+                f_head.hide()
+                f_head.flowey_snicker(True)
+                f_static.force_static(1)
+                f_static.attempt = False
+            elif event_number == 16:
+                EFFECTS.FLOWEY_CREEPY_LAUGH_SLOW.play()
+            elif event_number == 17:
+                f_head.animation.set_current(0)
+                f_head.show()
+                f_static.force_static(1)
+                f_static.attempt = True
+            elif event_number == 18:
+                self.board.story.play(self.board.story.pre_fight_story_before_walk)
+                self.board.running = True
+                self.board.pause_loop = False
+        elif story_number == 3:
+            f_head = self.entities.get_items_by_class(flowey_head).first()
+            f_static = self.entities.get_items_by_class(flowey_static).first()
+            p_char = self.entities.get_items_by_class(character).first()
+
+            if event_number == 0:
+                f_head.animation.set_current(7)
+            elif event_number == 1:
+                f_head.animation.set_current(2)
+            elif event_number == 2:
+                f_head.animation.set_current(0)
+            elif event_number == 3:
+                f_head.animation.set_current(1)
+            elif event_number == 4:
+                f_head.animation.set_current(20)
+            elif event_number == 5:
+                f_head.animation.set_current(21)
+            elif event_number == 6:
+                f_head.animation.set_current(22)
+            elif event_number == 7:
+                p_char.move_up_slightly = True
+            elif event_number == 8:
+                f_head.animation.set_current(23)
+                self.board.story.play(self.board.story.pre_fight_story_before_fight)
+                self.board.running = True
+                self.board.pause_loop = False
+            elif event_number == 9:
+                f_head.animation.set_current(24)
+            elif event_number == 10:
+                f_head.animation.set_current(25)
+                f_static.attempt = False
+                SONGS.YOU_IDIOT.stop()
+            elif event_number == 11:
+                self.entities.remove(f_head)
+                self.entities.remove(f_static)
 
 class my_screen:
     def __init__(self) -> None:

@@ -10,6 +10,8 @@ class song:
         self.channel = mixer.find_channel()
 
     def play(self, volume: float = 1.0, pitch: float = 1.0, loops: int = -1) -> None:
+        self.channel = mixer.find_channel()
+
         if pitch != 1.0:
             self.change_pitch(pitch)
 
@@ -50,6 +52,8 @@ class effect:
         self.channel = mixer.find_channel()
 
     def play(self, volume_left: float = 1.0, volume_right: float = 1.0, pitch: float = 1.0, loops: int = 0) -> None:
+        self.channel = mixer.find_channel()
+
         if pitch != 1.0:
             self.change_pitch(pitch)
 
@@ -57,7 +61,7 @@ class effect:
 
         if self.is_playing():
             self.channel.stop()
-
+            
         self.channel.play(self.sound, loops)
 
     def is_playing(self) -> bool:
@@ -93,6 +97,7 @@ class predef_songs:
 
         self.STORY = song(location, "story")
         self.STORY_FROZEN = song(location, "frozen_story")
+        self.YOU_IDIOT = song(location, "you_idiot")
 
 class predef_effects:
     def __init__(self) -> None:
@@ -105,3 +110,9 @@ class predef_effects:
         self.PUNCH_SLOWER = effect(location, "punch_slower")
         self.PUNCH_SLOWEST = effect(location, "punch_slowest")
         self.EXPLOSION = effect(location, "explosion")
+        self.SHORT_STATIC = effect(location, "short_static")
+        self.SHORT_MEDIUM_STATIC = effect(location, "short_medium_static")
+        self.MEDIUM_STATIC = effect(location, "medium_static")
+        self.STATIC = effect(location, "static")
+        self.FLOWEY_CREEPY_LAUGH_NORMAL = effect(location, "flowey_creepy_laugh")
+        self.FLOWEY_CREEPY_LAUGH_SLOW = effect(location, "flowey_creepy_laugh_slow")

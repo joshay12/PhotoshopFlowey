@@ -1,5 +1,5 @@
 #Specifically import these items rather than the entirety of pygame.
-from pygame import K_UP, K_DOWN, K_LEFT, K_RIGHT, K_z, K_ESCAPE, key as k
+from pygame import K_F4, K_UP, K_DOWN, K_LEFT, K_RIGHT, K_z, K_ESCAPE, key as k
 
 #A class which makes input much simpler and easier to handle and understand.
 class keyboard:
@@ -38,3 +38,7 @@ class keyboard:
     #Check if the ESCAPE key is pressed.
     def is_esc(self) -> bool:
         return self.keys[K_ESCAPE]
+
+    #Check if the F4 key is pressed.
+    def is_f4(self) -> bool:
+        return self.keys[K_F4]
