@@ -3,11 +3,22 @@ from pygame import Rect, Surface
 from abc import abstractmethod
 from math import sqrt
 
+MY_SCREEN = None
+
+class entity_init:
+    def __init__(self, my_screen) -> None:
+        global MY_SCREEN
+
+        MY_SCREEN = my_screen
+
 #This is an abstract class dedicated to making entities and having them function properly.
 class entity:
     #This constructor requires the animation associated with the entity (even if there is only 1 sprite in it).
     #The x and y are optional to set, but can determine where you'd like the entity to appear on the screen.
     def __init__(self, animation: animation, x: float = 0.0, y: float = 0.0, force_center: bool = False, force_copy: bool = True) -> None:
+        global MY_SCREEN
+
+        self.my_screen = MY_SCREEN
         self.animation = animation.copy() if force_copy else animation
         self.x = x
         self.y = y
@@ -106,9 +117,40 @@ class entity_collection:
     def remove_at(self, index: int) -> None:
         self.entities.remove(self.get(index))
 
+    def remove_range(self, entities: 'entity_collection') -> None:
+        for i in range(entities.size()):
+            self.remove(entities.get(i))
+
     #Retrieves the entity found at the index provided.
     def get(self, index: int) -> entity:
         return self.entities[index]
+
+    #Retrieves the first entity in the list.
+    def first(self) -> entity:
+        if len(self.entities) == 0:
+            raise Exception("You tried to get the first item of an empty list.")
+
+        return self.get(0)
+
+    #Retrieves the last entity in the list.
+    def last(self) -> entity:
+        if len(self.entities) == 0:
+            raise Exception("You tried to get the last item of an empty list.")
+
+        return self.get(self.size() - 1)
+
+    def has_item_by_class(self, class_type: type) -> bool:
+        return self.get_items_by_class(class_type).size() > 0
+
+    #Retrieves all entities with the class type provided.
+    def get_items_by_class(self, class_type: type) -> 'entity_collection':
+        output = entity_collection()
+
+        for item in self.entities:
+            if type(item) is class_type:
+                output.add(item)
+
+        return output
 
     #Gets the index of the entity provided. Returns -1 if none was found.
     def index_of(self, entity: entity) -> int:
@@ -133,4 +175,5 @@ class entity_collection:
     #Renders all the entities.
     def render(self, screen: Surface) -> None:
         for entity in self.entities:
-            entity.render(screen)
+            if entity.visible:
+                entity.render(screen)
