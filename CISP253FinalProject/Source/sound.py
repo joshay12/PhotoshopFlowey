@@ -98,6 +98,9 @@ class predef_songs:
         self.STORY = song(location, "story")
         self.STORY_FROZEN = song(location, "frozen_story")
         self.YOU_IDIOT = song(location, "you_idiot")
+        self.FLOWEY_MEGA_LAUGH = song(location, "mega_laugh")
+        self.YOUR_BEST_NIGHTMARE_INTRO = song(location, "your_best_nightmare_intro")
+        self.YOUR_BEST_NIGHTMARE_THEME1 = song(location, "your_best_nightmare_theme1")
 
 class predef_effects:
     def __init__(self) -> None:
@@ -116,3 +119,6 @@ class predef_effects:
         self.STATIC = effect(location, "static")
         self.FLOWEY_CREEPY_LAUGH_NORMAL = effect(location, "flowey_creepy_laugh")
         self.FLOWEY_CREEPY_LAUGH_SLOW = effect(location, "flowey_creepy_laugh_slow")
+        self.SOUL_PREPARE = effect(location, "prepare_for_battle")
+        self.SOUL_SEND_TO_BATTLE = effect(location, "send_to_battle")
+        self.SOUL_HURT = effect(location, "hurt")

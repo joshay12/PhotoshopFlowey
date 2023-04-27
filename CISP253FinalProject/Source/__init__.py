@@ -5,8 +5,9 @@ from flowey import flowey
 from fonts import story, fonts_init
 from sound import predef_effects, predef_songs, EFFECTS, SONGS
 from story_board import story_board, intro_picture, file_backdrop, file_shattered, flowey_head, flowey_static
-from player import character, save_star
+from player import character, save_star, soul, soul_npc
 from getpass import getuser
+from math import sin
 import pygame, random
 
 GLOBAL_SCREEN = None
@@ -33,6 +34,10 @@ class window:
         EFFECTS = predef_effects()
         SONGS = predef_songs()
 
+        self.red = 0
+        self.red_increase = True
+        self.begin_fight = False
+        self.stop_red = False
         self.f4 = False
         self.running = False
         self.keyboard = keyboard()
@@ -43,10 +48,10 @@ class window:
         self.entities.add(character(self, 640 / 2, 480 - 480 / 3, self.screen.get_width(), self.screen.get_height(), self.keyboard, SPRITESHEETS))
         self.entities.add(save_star(640 / 2, -350, self.entities, SPRITESHEETS))
         self.entities.get_items_by_class(character).first().set_save_star(self.entities).set_heal_effect(EFFECTS.HEAL)
-        self.flowey = flowey(SPRITESHEETS, 0, 0)
+        self.flowey = flowey(self, SPRITESHEETS, 0, -475)
         self.board = story_board(story(SPRITESHEETS, EFFECTS, self.keyboard), self.entities, self)
 
-        self.flowey.visible = False
+        self.tick = 0
 
     def run(self) -> None:
         global MY_SCREEN, EFFECTS
@@ -56,8 +61,6 @@ class window:
         delta_time = 0.0
         updates_per_second = 60
         tick = 0
-
-        SONGS.STORY.play(pitch = 0.9, loops = 0)
 
         while self.running:
             for event in pygame.event.get():
@@ -73,8 +76,9 @@ class window:
 
                 delta_time -= 1.0 / updates_per_second
 
-            if not self.board.running:
-                self.board.begin(2) #INSERT NUMBER HERE TO SKIP TO CERTAIN PORTION OF STORY.
+            if not self.board.running and tick == 5:
+                SONGS.STORY.play(pitch = 0.9, loops = 0)
+                self.board.begin(EFFECTS, 3) #INSERT NUMBER HERE TO SKIP TO CERTAIN PORTION OF STORY.
 
             tick += 1
 
@@ -96,8 +100,29 @@ class window:
         elif self.f4 and not self.keyboard.is_f4():
             self.f4 = False
 
+        if self.begin_fight and not self.stop_red:
+            if self.tick > 0:
+                self.tick -= 1
+
+                return
+
+            self.red += 8 if self.red_increase else -8
+
+            if self.red_increase and self.red > 100:
+                self.red = 100
+                self.tick = 20
+                self.red_increase = False
+            elif not self.red_increase and self.red < 0:
+                self.red = 0
+                self.red_increase = True
+        elif self.red > 0 and self.stop_red:
+            self.red -= 8
+
+            if self.red < 0:
+                self.red = 0
+
     def render(self) -> None:
-        self.screen.fill((0, 0, 0))
+        self.screen.fill((self.red, 0, 0))
 
         #self.entities.render(self.screen)
         self.board.render(self.screen)
@@ -178,6 +203,12 @@ class window:
             elif event_number == 9:
                 f_head.animation.set_current(5)
             elif event_number == 10:
+                for _ in range(6):
+                    if self.entities.has_item_by_class(file_shattered):
+                        self.entities.remove(self.entities.get_items_by_class(file_shattered).first())
+                    else:
+                        break
+
                 f_head.hide()
                 f_head.flowey_snicker(False)
                 f_static.force_static(1)
@@ -272,8 +303,62 @@ class window:
                 f_static.attempt = False
                 SONGS.YOU_IDIOT.stop()
             elif event_number == 11:
+                skipped = False
+
+                for _ in range(6):
+                    if self.entities.has_item_by_class(file_shattered):
+                        self.entities.remove(self.entities.get_items_by_class(file_shattered).first())
+
+                        skipped = True
+                    else:
+                        break
+
                 self.entities.remove(f_head)
                 self.entities.remove(f_static)
+                self.entities.add(soul(skipped, self, p_char, self.keyboard, EFFECTS, SPRITESHEETS))
+        elif story_number == 4:
+            if event_number == 0:
+                self.entities.remove(self.entities.get_items_by_class(character).first())
+            elif event_number == 1:
+                x = 640 / 2 - 40
+                y = 480 / 2 - 30
+
+                for i in range(6):
+                    self.entities.add(soul_npc(self, x, y, i, EFFECTS, SPRITESHEETS))
+
+                    if i == 3:
+                        x = 640 / 2 - 40
+                        y -= 50
+                    elif i == 4:
+                        x = 640 / 2 + 40
+                    else:
+                        alter_x = x - 640 / 2
+                        alter_x *= -2
+
+                        x += alter_x
+
+                        if i % 2 == 1:
+                            x += sin(y * -5) * 70
+                            y -= 50
+            elif event_number == 2:
+                EFFECTS.SOUL_SEND_TO_BATTLE.play()
+            elif event_number == 3:
+                for _ in range(6):
+                    if self.entities.has_item_by_class(soul_npc):
+                        self.entities.remove(self.entities.get_items_by_class(soul_npc).first())
+                    else:
+                        break
+
+                self.begin_fight = True
+                self.flowey.visible = True
+                self.flowey.tick = 0
+                self.flowey.move_to_0 = True
+
+                SONGS.YOUR_BEST_NIGHTMARE_INTRO.play(loops = 0)
+            elif event_number == 4:
+                self.stop_red = True
+                self.begin_fight = False
+
 
 class my_screen:
     def __init__(self) -> None:

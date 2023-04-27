@@ -32,9 +32,11 @@
     <Compile Include="Source\__init__.py" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Resources\Images\Flowey\Souls\" />
     <Folder Include="Resources\Images\Intro Screen\" />
     <Folder Include="Resources\Images\File Backdrop\" />
     <Folder Include="Resources\Images\Flowey\" />
+    <Folder Include="Resources\Images\Player\Soul\" />
     <Folder Include="Resources\Images\Static\" />
     <Folder Include="Resources\Images\Save Star\" />
     <Folder Include="Resources\Images\Player\" />
@@ -87,6 +89,12 @@
     <Content Include="Resources\Images\Flowey\face7.png" />
     <Content Include="Resources\Images\Flowey\face8.png" />
     <Content Include="Resources\Images\Flowey\face9.png" />
+    <Content Include="Resources\Images\Flowey\Souls\soul1.png" />
+    <Content Include="Resources\Images\Flowey\Souls\soul2.png" />
+    <Content Include="Resources\Images\Flowey\Souls\soul3.png" />
+    <Content Include="Resources\Images\Flowey\Souls\soul4.png" />
+    <Content Include="Resources\Images\Flowey\Souls\soul5.png" />
+    <Content Include="Resources\Images\Flowey\Souls\soul6.png" />
     <Content Include="Resources\Images\Intro Screen\image2.png" />
     <Content Include="Resources\Images\Intro Screen\image1.png" />
     <Content Include="Resources\Images\Player\Character\player_down2.png" />
@@ -101,6 +109,8 @@
     <Content Include="Resources\Images\Player\Character\player_up3.png" />
     <Content Include="Resources\Images\Player\Character\player_up4.png" />
     <Content Include="Resources\Images\Player\Character\player_up1.png" />
+    <Content Include="Resources\Images\Player\Soul\soul1.png" />
+    <Content Include="Resources\Images\Player\Soul\soul2.png" />
     <Content Include="Resources\Images\Save Star\save1.png" />
     <Content Include="Resources\Images\Save Star\save2.png" />
     <Content Include="Resources\Images\Static\static1.png" />

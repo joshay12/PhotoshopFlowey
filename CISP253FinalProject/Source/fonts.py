@@ -39,12 +39,12 @@ class story:
 
 		#Parameter usage: Font, Text, X, Y, Sound Effect, Speed, Shake, Delay, Auto Proceed, and Change Event.
 		self.pre_story_lines.append(line(self.undertale, "Long ago, two races\nruled over the Earth:\nHUMANS and MONSTERS{d=75}", 120, 325, None, 4, 0, 0, True, False))
-		self.pre_story_lines.append(line(self.undertale, "One day, the{d=30}", 120, 325, None, 4, 0, 0, True, False))
+		self.pre_story_lines.append(line(self.undertale, "One day, the{d=30}", 120, 325, None, 5, 0, 0, True, False))
 		self.pre_story_lines.append(line(self.undertale, "One day, they all\ndisappeared without\na trace.{d=300}", 120, 325, None, 0, 0, 0, True, True))
 		self.pre_story_lines.append(clear_line(True))
 
 		pre_fight_y_location = 275
-		pre_fight_speed = 3
+		pre_fight_speed = 0
 
 		self.pre_fight_story_before_first_snicker.append(line(self.undertale, "Howdy!", 120, pre_fight_y_location, effects.FLOWEY_TALK_NORMAL, pre_fight_speed, 0, 0, False, False))
 		self.pre_fight_story_before_first_snicker.append(line(self.undertale, "It's me, FLOWEY.", 120, pre_fight_y_location, effects.FLOWEY_TALK_NORMAL, pre_fight_speed, 0, 0, False, False))

@@ -1,7 +1,7 @@
 from entity import entity, entity_collection
 from sprites import predef_spritesheets
 from input import keyboard
-from sound import effect
+from sound import effect, predef_effects
 from pygame import Surface
 
 class save_star(entity):
@@ -72,6 +72,11 @@ class character(entity):
                 self.ending_discussion_tick += 1
             elif self.move_to_bottom and self.origin_y < 360 and not self.move_up_slightly:
                 self.origin_y += 8
+
+                if self.origin_x < 640 / 2 - self.width / 2 - 4:
+                    self.origin_x += 4
+                elif self.origin_x > 640 / 2 - self.width / 2 + 4:
+                    self.origin_x -= 4
 
             if self.ending_discussion_tick == 60:
                 self.window.run_event(3, 8)
@@ -176,6 +181,170 @@ class character(entity):
 
         self.origin_x = self.x
         self.origin_y = self.y
+
+    def render(self, screen: Surface) -> None:
+        screen.blit(self.get_sprite().image, self.get_data())
+
+class soul(entity):
+    def __init__(self, skipped: bool, window, owner: character, keyboard: keyboard, effects: predef_effects, spritesheets: predef_spritesheets) -> None:
+        super().__init__(spritesheets.PLAYER_SOUL_ANIMATION, owner.x, owner.y, True, False)
+
+        self.window = window
+        self.owner = owner
+        self.keyboard = keyboard
+        self.effects = effects
+
+        self.x -= self.width / 2 - self.owner.width / 2 + 1
+        self.y -= self.height / 2 - self.owner.height / 2 - 14
+
+        self.origin_x = self.x
+        self.origin_y = self.y
+
+        self.speed = 4
+        self.tick = 0 if not skipped else -60
+        self.controls = False
+        self.prepare = True
+        self.send = False
+        self.move_to_position = False
+        self.visible = False
+        self.layer = 3
+
+    def update(self) -> None:
+        if not self.controls:
+            if self.prepare:
+                self.tick += 1
+
+                if self.tick < 0:
+                    return
+
+                increment = 8
+
+                if not self.send:
+                    if self.tick % increment == 0:
+                        self.visible = False
+                    elif self.tick % increment == int(increment / 2):
+                        self.visible = True
+                        self.effects.SOUL_PREPARE.play()
+
+                    if self.tick >= increment * 3:
+                        self.send = True
+                        self.visible = True
+                elif self.tick % increment == 3 and not self.move_to_position:
+                    self.effects.SOUL_SEND_TO_BATTLE.play()
+                    self.move_to_position = True
+                    self.window.run_event(4, 0)
+                elif self.move_to_position and self.origin_y < 400:
+                    self.origin_y += 1.75
+                    self.tick = 0
+                elif self.origin_y >= 400:
+                    if self.tick == 60:
+                        self.window.run_event(4, 1)
+                        self.prepare = False
+
+                self.x = self.origin_x
+                self.y = self.origin_y
+
+            return
+
+        x = 0
+        y = 0
+
+        if self.keyboard.is_up():
+            y = -self.speed
+        elif self.keyboard.is_down():
+            y = self.speed
+        
+        if self.keyboard.is_left():
+            x = -self.speed
+        elif self.keyboard.is_right():
+            x = self.speed
+
+        self.origin_x += x
+        self.origin_y += y
+
+    def render(self, screen: Surface) -> None:
+        screen.blit(self.get_sprite().image, self.get_data())
+
+class soul_npc(entity):
+    def __init__(self, window, x: int, y: int, soul_number: int, effects: predef_effects, spritesheets: predef_spritesheets) -> None:
+        super().__init__(spritesheets.NPC_SOULS_ANIMATION, x, y, True, True)
+
+        self.animation.set_current(soul_number)
+
+        self.window = window
+        self.effects = effects
+        self.soul_number = soul_number
+
+        self.x -= self.width / 2
+        self.y -= self.height / 2
+
+        self.origin_x = self.x
+        self.origin_y = self.y
+
+        self.speed = 2
+        self.tick = self.soul_number * -16
+        self.send = False
+        self.ready = False
+        self.fade = False
+        self.finished = False
+        self.opacity = 255
+        self.visible = False
+        self.layer = 3
+
+    def update(self) -> None:
+        if self.tick < 0:
+            self.tick += 1
+            return
+
+        increment = 8
+
+        if not self.ready:
+            self.tick += 1
+
+            if self.tick % increment == 0:
+                self.visible = False
+            elif self.tick % increment == int(increment / 2):
+                self.visible = True
+                self.effects.SOUL_PREPARE.play()
+
+            if self.tick >= increment * 3:
+                self.visible = True
+                self.ready = True
+                self.tick = (80 - self.soul_number * 16) + 25
+        elif not self.send:
+            self.tick -= 1
+
+            if self.tick == 0:
+                if self.soul_number == 0:
+                    self.window.run_event(4, 2)
+                
+                self.send = True
+        elif self.send and not self.fade:
+            self.tick += 1
+
+            if self.tick < 20:
+                self.origin_x += -self.speed if self.origin_x < 640 / 2 else self.speed
+                self.origin_y += (-self.speed if self.origin_y < 150 else 0) if self.origin_y < 154 else self.speed
+            elif self.tick == 20:
+                self.fade = True
+        elif self.fade and not self.finished:
+            self.opacity -= 12
+
+            if self.opacity < 0:
+                self.opacity = 0
+                self.visible = False
+                self.finished = True
+                self.tick = 0
+
+            self.get_sprite().change_opacity(self.opacity)
+        elif self.finished and self.soul_number == 0:
+            self.tick += 1
+
+            if self.tick == 60:
+                self.window.run_event(4, 3)
+
+        self.x = self.origin_x
+        self.y = self.origin_y
 
     def render(self, screen: Surface) -> None:
         screen.blit(self.get_sprite().image, self.get_data())

@@ -122,14 +122,36 @@ class sprite:
         self.image = pygame.transform.smoothscale(self.origin_image, (width * percent, height * percent))
         self.size = percent
 
+    def resize_image_set_default(self, percent: float) -> None:
+        width = self.origin_image.get_width()
+        height = self.origin_image.get_height()
+
+        self.image = pygame.transform.smoothscale(self.origin_image, (width * percent, height * percent))
+        self.origin_image = self.image.copy()
+        self.origin_image_string = pygame.image.tostring(self.origin_image, "RGBA")
+        self.size = percent
+
+    def make_silhouette(self) -> None:
+        image = Image.frombuffer("RGBA", self.origin_image.get_size(), self.origin_image_string, "raw", "RGBA", 0, 1)
+        enhancer = ImageEnhance.Brightness(image)
+        new_image = enhancer.enhance(-1.0)
+
+        self.image = pygame.image.fromstring(new_image.tobytes(), new_image.size, new_image.mode)
+        self.origin_image = self.image.copy()
+        self.origin_image_string = pygame.image.tostring(self.origin_image, "RGBA")
+
     def set_brightness(self, brightness: float) -> None:
         image = Image.frombuffer("RGBA", self.origin_image.get_size(), self.origin_image_string, "raw", "RGBA", 0, 1)
         enhancer = ImageEnhance.Brightness(image)
         new_image = enhancer.enhance(brightness)
 
         self.image = pygame.image.fromstring(new_image.tobytes(), new_image.size, new_image.mode)
-        #self.resize_image_set(1.0)
-    
+
+    def change_opacity(self, opacity: int) -> None:
+        self.image = self.origin_image.copy()
+
+        self.image.set_alpha(opacity)
+        
     #Easy way to get the width of the image.
     def get_width(self) -> int:
         return self.image.get_width()
@@ -201,6 +223,18 @@ class animation:
 
         return animation(sprites, self.increment)
 
+    def make_silhouette(self) -> None:
+        for sprite in self.sprites:
+            sprite.make_silhouette()
+
+    def set_brightness(self, brightness: float) -> None:
+        for sprite in self.sprites:
+            sprite.set_brightness(brightness)
+
+    def change_opacity_all(self, opacity: int) -> None:
+        for sprite in self.sprites:
+            sprite.change_opacity(opacity)
+
     #Changes the animation frame the amount set within the parameter.
     def change_animation(self, amount: int) -> None:
         #Increases the animation from the amount provided and prevents the index from exceeding the animation limits.
@@ -246,10 +280,11 @@ class animation:
         self.sprites[index].resize_image(percent)
 
         return sprite([self.sprites[index].image])
-        #width = self.sprites[index].get_width()
-        #height = self.sprites[index].get_height()
-        #
-        #return sprite([pygame.transform.scale(self.sprites[index].image, (width * percent, height * percent))])
+
+    def resize_image_set_default(self, index: int, percent: float) -> 'sprite':
+        self.sprites[index].resize_image_set_default(percent)
+
+        return sprite([self.sprites[index].image])
 
     #Resize an entire animation according to the tuple provided for size.
     def resize_images(self, percent: float) -> 'animation':
@@ -260,11 +295,19 @@ class animation:
 
         return animation(sprites, self.increment)
 
+    def resize_images_set_defaults(self, percent: float) -> 'animation':
+        sprites = []
+
+        for i in range(len(self.sprites)):
+            sprites.append(self.resize_image_set_default(i, percent))
+
+        return animation(sprites, self.increment)
+
     def copy(self) -> 'animation':
         sprites = []
 
         for i in range(len(self.sprites)):
-            sprites.append(sprite([self.sprites[i].image]))
+            sprites.append(sprite([self.sprites[i].image.copy()]))
 
         return animation(sprites, self.increment)
 
@@ -298,6 +341,13 @@ class predef_spritesheets:
         self.PLAYER_LEFT_ANIMATION = animation(self.PLAYER_LEFT_SPRITESHEET.get_sprites(), 0)
         self.PLAYER_RIGHT_ANIMATION = animation(self.PLAYER_RIGHT_SPRITESHEET.get_sprites(), 0)
 
+        self.PLAYER_SOUL_SPRITESHEET = spritesheet(screen, self.PLAYER_PATH + "Soul", "soul", 2).resize_images(0.5)
+        self.PLAYER_SOUL_ANIMATION = animation(self.PLAYER_SOUL_SPRITESHEET.get_sprites(), 0)
+
+        #Other Souls Animation
+        self.NPC_SOULS_SPRITESHEET = spritesheet(screen, "Resources/Images/Flowey/Souls", "soul", 6).resize_images(0.5)
+        self.NPC_SOULS_ANIMATION = animation(self.NPC_SOULS_SPRITESHEET.get_sprites(), 0)
+
         #Save Star Animation
         self.SAVE_STAR_SPRITESHEET = spritesheet(screen, "Resources/Images/Save Star", "save", 2)
         self.SAVE_STAR_ANIMATION = animation(self.SAVE_STAR_SPRITESHEET.get_sprites(), 10)
@@ -320,9 +370,12 @@ class predef_spritesheets:
         #Omega Flowey Animations
         self.FLOWEY_PATH = "Resources/Images/Omega Flowey/"
 
-        #BACKGROUND ANIMATION
+        #BACKGROUND ANIMATIONS
         self.BACKGROUND_SPRITESHEET = spritesheet(screen, self.FLOWEY_PATH + "Misc", "backdrop", 1)
         self.BACKGROUND_ANIMATION = animation(self.BACKGROUND_SPRITESHEET.get_sprites(), 0)
+
+        self.EXTENDER_SPRITESHEET = spritesheet(screen, self.FLOWEY_PATH + "Misc", "extender", 1)
+        self.EXTENDER_ANIMATION = animation(self.EXTENDER_SPRITESHEET.get_sprites(), 0)
 
         #STALKS ANIMATION
         self.STALKS_SPRITESHEET = spritesheet(screen, self.FLOWEY_PATH + "Stalks", "Stalk", 62).resize_images(0.4)
@@ -350,9 +403,16 @@ class predef_spritesheets:
         self.VINES_3_ANIMATION_LEFT = animation(self.VINES_3_SPRITESHEET.get_sprites(), 0)
         self.VINES_3_ANIMATION_RIGHT = self.VINES_3_ANIMATION_LEFT.flip_all_horizontally()
 
-        #TV ANIMATION
+        #TV ANIMATIONS
         self.TV_SPRITESHEET = spritesheet(screen, self.FLOWEY_PATH + "TV", "TV", 3).resize_images(0.5)
         self.TV_ANIMATION = animation(self.TV_SPRITESHEET.get_sprites(), 0)
+
+        self.TV_OVERLAY_SPRITESHEET = spritesheet(screen, self.FLOWEY_PATH + "TV", "white_overlay", 1).resize_images(0.25)
+        self.TV_OVERLAY_ANIMATION = animation(self.TV_OVERLAY_SPRITESHEET.get_sprites(), 0)
+
+        #TV FACE ANIMATION
+        self.TV_FACE_SPRITESHEET = spritesheet(screen, self.FLOWEY_PATH + "Face", "mega_face", 15).resize_images(0.5)
+        self.TV_FACE_ANIMATION = animation(self.TV_FACE_SPRITESHEET.get_sprites(), 0)
 
         #FULL HEAD ANIMATION
         self.HEAD_SPRITESHEET = spritesheet(screen, self.FLOWEY_PATH + "Head", "head", 10).resize_images(0.5)

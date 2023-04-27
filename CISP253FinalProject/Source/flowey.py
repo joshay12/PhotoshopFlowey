@@ -6,14 +6,17 @@ STALK_SPEED = 3
 ORGAN_SIZE_OFFSET = 1.0
 
 class flowey:
-    def __init__(self, sheets: predef_spritesheets, x: int, y: int) -> None:
+    def __init__(self, window, sheets: predef_spritesheets, x: int, y: int) -> None:
         global ORGAN_SIZE_OFFSET
 
+        self.window = window
         self.x = x;
         self.y = y;
-        self.brightness = 0.0
+        self.brightness = 0
         self.sheets = sheets
-        self.visible = True
+        self.visible = False
+        self.move_to_0 = False
+        self.reveal_flowey = False
 
         self.entities = entity_collection()
 
@@ -143,7 +146,7 @@ class flowey:
 
         self.tick = 0
 
-        #self.set_brightness_all()
+        self.set_brightness_all()
 
     def current_degree(self, degree: int) -> int:
         while degree > 360:
@@ -173,18 +176,27 @@ class flowey:
             entity.update()
 
         self.tick += 1
-        
-        #if self.tick == 5:
-        #    self.fully_bright = False
-        #    self.set_brightness_all()
-        #elif self.tick > 120 and self.tick % 2 == 0 and self.brightness < 1.0:
-        #    self.brightness += 0.1
-        #    self.set_brightness_all()
-        #elif self.tick > 120 and self.tick % 2 == 0 and not self.fully_bright:
-        #    self.brightness = 1.0
-        #    self.set_brightness_all()
-        #    self.readjust_sizes()
-        #    self.fully_bright = True
+
+        if self.move_to_0 and self.y < 0:
+            self.y += 0.6
+
+            if self.y > 0:
+                self.y = 0
+                self.move_to_0 = False
+
+        if self.tick == 960 and self.y == 0 and not self.reveal_flowey:
+            self.entities.add(white_overlay(self.entities.get_items_by_class(television).first(), self.sheets))
+        elif self.reveal_flowey and self.brightness < 255:
+            global STALK_SPEED
+
+            STALK_SPEED = 1
+
+            self.brightness += 20
+
+            if self.brightness > 255:
+                self.brightness = 255
+
+            self.set_brightness_all()
 
     def render(self, screen: Surface) -> None:
         if not self.visible:
@@ -193,8 +205,102 @@ class flowey:
         for entity in self.entities.entities:
             entity.render(screen)
 
+class white_overlay(entity):
+    def __init__(self, tv: 'television', spritesheets: predef_spritesheets) -> None:
+        super().__init__(spritesheets.TV_OVERLAY_ANIMATION, 0, 0, False, False)
+
+        self.tv = tv
+
+        self.x = self.tv.x + 17
+        self.y = self.tv.y + self.tv.height / 2 - self.height / 3 + 3
+        self.opacity = 0
+        self.tick = 0
+        self.layer = 3000
+
+        self.get_sprite().change_opacity(self.opacity)
+        self.face = flowey_face(self, spritesheets)
+        self.tv.owner.entities.add(self.face)
+
+    def set_brightness(self, _: int):
+        pass
+
+    def update(self) -> None:
+        if STALK_SPEED < 3:
+            self.x = self.tv.x + 17
+            self.y = self.tv.y + self.tv.height / 2 - self.height / 3 + 3
+
+        self.get_sprite().change_opacity(self.opacity)
+
+        self.opacity += 4
+
+        if self.opacity > 255:
+            self.opacity = 255
+
+    def render(self, screen: Surface) -> None:
+        if not self.visible:
+            return
+
+        screen.blit(self.get_sprite().image, self.get_data())
+
+class flowey_face(entity):
+    def __init__(self, overlay: 'white_overlay', spritesheets: predef_spritesheets) -> None:
+        super().__init__(spritesheets.TV_FACE_ANIMATION, 0, 0, True, False)
+
+        self.overlay = overlay
+
+        self.x = self.overlay.x + self.overlay.width / 2 - self.width / 2
+        self.y = self.overlay.y + self.overlay.height / 2 - 32
+        self.y_offset = 0
+        self.opacity = self.overlay.opacity
+        self.tick = 0
+        self.layer = self.overlay.layer + 1
+        self.full_smile = False
+
+        self.get_sprite().change_opacity(self.opacity)
+
+    def set_brightness(self, _: int):
+        pass
+
+    def update(self) -> None:
+        c_height = self.get_sprite().get_height()
+
+        self.animation.update()
+
+        n_height = self.get_sprite().get_height()
+
+        self.y_offset -= int((n_height - c_height) / 2)
+
+        self.opacity = self.overlay.opacity
+        self.x = self.overlay.x + self.overlay.width / 2 - self.width / 2
+        self.y = self.overlay.y + self.overlay.height / 2 - 32 - self.y_offset
+        self.get_sprite().change_opacity(self.opacity)
+
+        if self.opacity >= 255:
+            if self.animation.index < 6:
+                self.animation.increment = 5
+            elif self.animation.index == 6 and self.tick < 60:
+                self.animation.increment = 0
+                self.tick += 1
+            elif self.animation.index == 6:
+                self.animation.next()
+                self.animation.increment = 5
+                self.tick = 0
+            elif self.animation.index == 10 and self.tick < 60:
+                self.animation.increment = 0
+                self.tick += 1
+            elif self.animation.index == 10 and self.tick == 60:
+                self.overlay.tv.owner.reveal_flowey = True
+                self.overlay.tv.owner.window.run_event(4, 4)
+                self.tick += 1
+
+    def render(self, screen: Surface) -> None:
+        if not self.visible:
+            return
+
+        screen.blit(self.get_sprite().image, self.get_data())
+
 class flowey_piece(entity):
-    def __init__(self, owner: flowey, left_animation: animation, right_animation: animation, x: int, y: int, flip: bool = False, layer: int = 0, force_center: bool = False, one_sided: bool = False, force_copy: bool = True) -> None:
+    def __init__(self, owner: flowey, left_animation: animation, right_animation: animation, x: int, y: int, flip: bool = False, layer: int = 0, force_center: bool = False, one_sided: bool = False, force_copy: bool = True, create_dark_piece_automatically: bool = True) -> None:
         super().__init__(left_animation if one_sided else (left_animation if not flip else right_animation), x + owner.x, y + owner.y, force_center = force_center, force_copy = force_copy)
 
         #Let the owner be able to move all x and y positions of the sprites.
@@ -207,13 +313,48 @@ class flowey_piece(entity):
         self.origin_y = y
         self.origin_direction = self.direction
         self.origin_image_direction = self.image_direction
+        self.brightness = 255
+        self.darkness = None
 
-    def set_brightness(self, brightness: float) -> None:
-        for item in self.animation.sprites:
-            item.set_brightness(brightness)
+        if create_dark_piece_automatically:
+            self.create_dark_piece(force_center)
+
+    def create_dark_piece(self, force_center: bool, resize: float = 1.0) -> None:
+        self.darkness = dark_piece(self, self.animation, force_center, resize)
+        self.owner.entities.add(self.darkness)
+
+    def set_brightness(self, brightness: int) -> None:
+        self.brightness = brightness
 
     def readjust_size(self) -> None:
         self.animation.resize_images(1.0)
+
+    def render(self, screen: Surface) -> None:
+        if not self.visible:
+            return
+
+        screen.blit(self.get_sprite().image, self.get_data())
+
+class dark_piece(flowey_piece):
+    def __init__(self, owner: flowey_piece, animation: animation, force_center: bool = False, resize: float = 1.0) -> None:
+        super().__init__(owner, animation, animation, owner.x, owner.y, False, 0, force_center, False, True, False)
+
+        if resize != 1.0:
+            self.animation.resize_images_set_defaults(resize)
+
+        self.owner = owner
+        self.animation.make_silhouette()
+        self.brightness = self.owner.brightness
+        self.visible = True
+        self.layer = self.owner.layer + 1000
+
+    def update(self) -> None:
+        self.brightness = self.owner.brightness
+
+        self.x = self.owner.x
+        self.y = self.owner.y
+        self.animation.change_opacity_all(255 - self.brightness)
+        self.animation.set_current(self.owner.animation.index)
 
     def render(self, screen: Surface) -> None:
         if not self.visible:
@@ -226,6 +367,9 @@ class background(flowey_piece):
     def __init__(self, owner: flowey, x: int, y: int) -> None:
         super().__init__(owner, owner.sheets.BACKGROUND_ANIMATION, None, x, y, False, 100, False, True, False)
 
+        self.extender = extender(self)
+        self.owner.entities.add(self.extender)
+
     def update(self) -> None:
         #If the stalks are moving at a certain pace, then increase the bobbing ticks.
         if STALK_SPEED > 1:
@@ -237,6 +381,21 @@ class background(flowey_piece):
         #Allows the owner (Flowey) to affect the x and y positioning of the organs.
         self.x = self.origin_x + self.owner.x
         self.y = self.origin_y + self.owner.y + bobbing_y
+
+        if self.darkness != None:
+            self.darkness.update()
+
+class extender(flowey_piece):
+    def __init__(self, owner: background) -> None:
+        super().__init__(owner, owner.owner.sheets.EXTENDER_ANIMATION, None, 0, 0, False, 249, False, False, True, False)
+
+        self.owner = owner
+        self.x = self.owner.origin_x + self.owner.owner.x + self.owner.width / 2 - self.width / 2 - 2
+        self.y = self.owner.origin_y + self.owner.owner.y + self.owner.height - self.height / 2 - 24
+
+    def update(self) -> None:
+        self.x = self.owner.origin_x + self.owner.owner.x + self.owner.width / 2 - self.width / 2 - 2
+        self.y = self.owner.origin_y + self.owner.owner.y + self.owner.height - self.height / 2 - 24
 
 #These are the green stalks with thorns on them on the left and right side of Flowey.
 class stalks(flowey_piece):
@@ -254,16 +413,21 @@ class stalks(flowey_piece):
             self.animation.update()
             self.animation.amount_to_skip = STALK_SPEED
 
+        if self.darkness != None:
+            self.darkness.update()
+
 #There are 6 organs for Flowey. They are the objects in the top-left and top-right corners which look like pipes.
 class organ(flowey_piece):
     def __init__(self, owner: flowey, x: int, y: int, flip: bool, layer_offset: int) -> None:
-        super().__init__(owner, owner.sheets.ORGANS_ANIMATION_LEFT, owner.sheets.ORGANS_ANIMATION_RIGHT, x, y, flip, 6 - layer_offset)
+        super().__init__(owner, owner.sheets.ORGANS_ANIMATION_LEFT, owner.sheets.ORGANS_ANIMATION_RIGHT, x, y, flip, 6 - layer_offset, create_dark_piece_automatically = False)
 
         global ORGAN_SIZE_OFFSET
 
         #Do not re-size the organs if it is the original.
         if ORGAN_SIZE_OFFSET < 1.0:
-            self.animation = self.animation.resize_images(ORGAN_SIZE_OFFSET)
+            self.animation = self.animation.resize_images_set_defaults(ORGAN_SIZE_OFFSET)
+
+        self.create_dark_piece(False)
 
         #Lessen the organ size by 10% next iteration.
         ORGAN_SIZE_OFFSET -= 0.1
@@ -276,6 +440,8 @@ class organ(flowey_piece):
         #If the stalks are moving at a certain pace, then increase the bobbing ticks.
         if STALK_SPEED > 1:
             self.tick += 0.04
+        else:
+            self.tick = 0
 
         #Handles the movement of the organs to be natural.
         inverse_tick = self.tick if self.origin_x > 200 else -self.tick
@@ -285,7 +451,14 @@ class organ(flowey_piece):
         #Allows the owner (Flowey) to affect the x and y positioning of the organs.
         self.x = self.origin_x + self.owner.x + bobbing_x
         self.y = self.origin_y + self.owner.y + bobbing_y
-        self.get_sprite().resize_image_set(1 + (sin(self.tick) * 1.5 / 100.0))
+
+        if self.brightness >= 255:
+            self.get_sprite().resize_image_set(1 + (sin(self.tick) * 1.5 / 100.0))
+        else:
+            self.get_sprite().resize_image_set(1.0)
+
+        if self.darkness != None:
+            self.darkness.update()
 
 #There are 2 hands for Flowey. They are the objects in the bottom-left and bottom-right corners which look like hands (... obviously).
 class hand(flowey_piece):
@@ -296,6 +469,8 @@ class hand(flowey_piece):
         #If the stalks are moving at a certain pace, then increase the bobbing ticks.
         if STALK_SPEED > 1:
             self.tick += 0.16
+        else:
+            self.tick = 0
 
         #Handles the movement of the hands to be natural.
         inverse_tick = self.tick if self.origin_x > 200 else -self.tick
@@ -305,7 +480,14 @@ class hand(flowey_piece):
         #Allows the owner (Flowey) to affect the x and y positioning of the organs.
         self.x = self.origin_x + self.owner.x + bobbing_x
         self.y = self.origin_y + self.owner.y + bobbing_y
-        self.get_sprite().resize_image_set(1 + (sin(self.tick / 2) * 1.8 / 100.0))
+
+        if self.brightness >= 255:
+            self.get_sprite().resize_image_set(1 + (sin(self.tick / 2) * 1.8 / 100.0))
+        else:
+            self.get_sprite().resize_image_set(1.0)
+
+        if self.darkness != None:
+            self.darkness.update()
 
 #There are 6 vines for Flowey. They are the objects in between the stalks and the hands. They are difficult to notice unless you pay extra attention to them.
 #This is the first iteration of the vines.
@@ -317,6 +499,8 @@ class vine_1(flowey_piece):
         #If the stalks are moving at a certain pace, then increase the bobbing ticks.
         if STALK_SPEED > 1:
             self.tick += 0.06
+        else:
+            self.tick = 0
 
         #Handles the movement of the vines to be natural.
         inverse_tick = self.tick if self.origin_x > 200 else -self.tick
@@ -326,7 +510,14 @@ class vine_1(flowey_piece):
         #Allows the owner (Flowey) to affect the x and y positioning of the organs.
         self.x = self.origin_x + self.owner.x + bobbing_x
         self.y = self.origin_y + self.owner.y + bobbing_y
-        self.get_sprite().resize_image_set(1 + (sin(-self.tick) / 100.0))
+        
+        if self.brightness >= 255:
+            self.get_sprite().resize_image_set(1 + (sin(-self.tick) / 100.0))
+        else:
+            self.get_sprite().resize_image_set(1.0)
+
+        if self.darkness != None:
+            self.darkness.update()
 
 #This is the second iteration of the vines.
 class vine_2(flowey_piece):
@@ -337,6 +528,8 @@ class vine_2(flowey_piece):
         #If the stalks are moving at a certain pace, then increase the bobbing ticks.
         if STALK_SPEED > 1:
             self.tick += 0.06
+        else:
+            self.tick = 0
 
         #Handles the movement of the vines to be natural.
         inverse_tick = self.tick if self.origin_x > 200 else -self.tick
@@ -346,7 +539,14 @@ class vine_2(flowey_piece):
         #Allows the owner (Flowey) to affect the x and y positioning of the organs.
         self.x = self.origin_x + self.owner.x + bobbing_x
         self.y = self.origin_y + self.owner.y + bobbing_y
-        self.get_sprite().resize_image_set(1 + (sin(-self.tick) / 100.0))
+        
+        if self.brightness >= 255:
+            self.get_sprite().resize_image_set(1 + (sin(-self.tick) / 100.0))
+        else:
+            self.get_sprite().resize_image_set(1.0)
+
+        if self.darkness != None:
+            self.darkness.update()
 
 #This is the third and final iteration of the vines.
 class vine_3(flowey_piece):
@@ -357,6 +557,8 @@ class vine_3(flowey_piece):
         #If the stalks are moving at a certain pace, then increase the bobbing ticks.
         if STALK_SPEED > 1:
             self.tick += 0.06
+        else:
+            self.tick = 0
 
         #Handles the movement of the vines to be natural.
         inverse_tick = self.tick if self.origin_x > 200 else -self.tick
@@ -366,7 +568,14 @@ class vine_3(flowey_piece):
         #Allows the owner (Flowey) to affect the x and y positioning of the organs.
         self.x = self.origin_x + self.owner.x + bobbing_x
         self.y = self.origin_y + self.owner.y + bobbing_y
-        self.get_sprite().resize_image_set(1 + (sin(self.tick / 1.8) * -1 / 100.0))
+        
+        if self.brightness >= 255:
+            self.get_sprite().resize_image_set(1 + (sin(self.tick / 1.8) * -1 / 100.0))
+        else:
+            self.get_sprite().resize_image_set(1.0)
+
+        if self.darkness != None:
+            self.darkness.update()
 
 #This is the TV atop Flowey's head.
 class television(flowey_piece):
@@ -379,6 +588,8 @@ class television(flowey_piece):
         #If the stalks are moving at a certain pace, then increase the bobbing ticks.
         if STALK_SPEED > 1:
             self.tick += 0.16
+        else:
+            self.tick = 0
 
         #Handles the movement of the TV to be natural.
         bobbing_y = sin(self.tick) * 2
@@ -386,6 +597,9 @@ class television(flowey_piece):
         #Allows the owner (Flowey) to affect the x and y positioning of the organs.
         self.x = self.origin_x + self.owner.x
         self.y = self.origin_y + self.owner.y + bobbing_y
+
+        if self.darkness != None:
+            self.darkness.update()
 
 #This is the top of the head just below the TV.
 class head_top(flowey_piece):
@@ -405,15 +619,20 @@ class head_top(flowey_piece):
         self.x = self.origin_x + self.owner.x
         self.y = self.origin_y + self.owner.y + bobbing_y
 
+        if self.darkness != None:
+            self.darkness.update()
+
 #These are the nostrils inside of the top head.
 class head_nostrils(flowey_piece):
     def __init__(self, owner: flowey, x: int, y: int) -> None:
-        super().__init__(owner, owner.sheets.HEAD_ANIMATION, owner.sheets.HEAD_ANIMATION, x, y, False, 252, False, True)
+        super().__init__(owner, owner.sheets.HEAD_ANIMATION, owner.sheets.HEAD_ANIMATION, x, y, False, 252, False, True, True, False)
 
-        self.animation.sprites[8].resize_image(1.1)
-        self.animation.sprites[9].resize_image(1.1)
+        self.animation.sprites[8].resize_image_set_default(1.1)
+        self.animation.sprites[9].resize_image_set_default(1.1)
         self.animation.set_current(8)
         self.nostril_tick = 0.0
+
+        self.create_dark_piece(False)
 
     def update(self) -> None:
         #If the stalks are moving at a certain pace, then increase the bobbing and nostril ticks from normal.
@@ -435,18 +654,26 @@ class head_nostrils(flowey_piece):
         self.x = self.origin_x + self.owner.x
         self.y = self.origin_y + self.owner.y + bobbing_y
 
+        if self.darkness != None:
+            self.darkness.update()
+
 #This is the bottom of the head, right in between the lips.
 class head_bottom(flowey_piece):
     def __init__(self, owner: flowey, x: int, y: int) -> None:
-        super().__init__(owner, owner.sheets.HEAD_ANIMATION, owner.sheets.HEAD_ANIMATION, x, y, False, 250, False, True)
+        super().__init__(owner, owner.sheets.HEAD_ANIMATION, owner.sheets.HEAD_ANIMATION, x, y, False, 250, False, True, True, False)
 
-        self.animation.sprites[3].resize_image(1.3)
+        self.animation.sprites[3].resize_image_set_default(1.3)
         self.animation.set_current(3)
+
+        self.create_dark_piece(False)
 
     def update(self) -> None:
         #Allows the owner (Flowey) to affect the x and y positioning of the organs.
         self.x = self.origin_x + self.owner.x
         self.y = self.origin_y + self.owner.y
+
+        if self.darkness != None:
+            self.darkness.update()
 
 #These are the lips just below the head.
 class head_lip(flowey_piece):
@@ -459,6 +686,8 @@ class head_lip(flowey_piece):
         #If the stalks are moving at a certain pace, then increase the bobbing ticks.
         if STALK_SPEED > 1:
             self.tick += 0.16
+        else:
+            self.tick = 0
 
         #Handles the movement of the vines to be natural.
         inverse_tick = self.tick if self.origin_x > 300 else -self.tick
@@ -468,7 +697,14 @@ class head_lip(flowey_piece):
         #Allows the owner (Flowey) to affect the x and y positioning of the organs.
         self.x = self.origin_x + self.owner.x + bobbing_x
         self.y = self.origin_y + self.owner.y + bobbing_y
-        self.get_sprite().resize_image_set(1 + (sin(self.tick * 0.75) * 4 / 100.0))
+        
+        if self.brightness >= 255:
+            self.get_sprite().resize_image_set(1 + (sin(self.tick * 0.75) * 4 / 100.0))
+        else:
+            self.get_sprite().resize_image_set(1.0)
+
+        if self.darkness != None:
+            self.darkness.update()
 
 #These are the teeth attached to the lips.
 class head_teeth(flowey_piece):
@@ -481,6 +717,8 @@ class head_teeth(flowey_piece):
         #If the stalks are moving at a certain pace, then increase the bobbing ticks.
         if STALK_SPEED > 1:
             self.tick += 0.16
+        else:
+            self.tick = 0
 
         #Handles the movement of the vines to be natural.
         inverse_tick = self.tick if self.origin_x > 300 else -self.tick
@@ -490,21 +728,32 @@ class head_teeth(flowey_piece):
         #Allows the owner (Flowey) to affect the x and y positioning of the organs.
         self.x = self.origin_x + self.owner.x + bobbing_x
         self.y = self.origin_y + self.owner.y + bobbing_y
-        self.get_sprite().resize_image_set(1 + (sin(self.tick * 0.75) * 4 / 100.0))
+        
+        if self.brightness >= 255:
+            self.get_sprite().resize_image_set(1 + (sin(self.tick * 0.75) * 4 / 100.0))
+        else:
+            self.get_sprite().resize_image_set(1.0)
+
+        if self.darkness != None:
+            self.darkness.update()
 
 #These are the dimples which go above the lips/teeth.
 class head_dimple(flowey_piece):
     def __init__(self, owner: flowey, x: int, y: int, flip: bool) -> None:
-        super().__init__(owner, owner.sheets.HEAD_ANIMATION, owner.sheets.HEAD_ANIMATION, x, y, flip, 255, False, True)
+        super().__init__(owner, owner.sheets.HEAD_ANIMATION, owner.sheets.HEAD_ANIMATION, x, y, flip, 255, False, True, True, False)
 
-        self.animation.sprites[1].resize_image(1.15)
-        self.animation.sprites[2].resize_image(1.15)
+        self.animation.sprites[1].resize_image_set_default(1.15)
+        self.animation.sprites[2].resize_image_set_default(1.15)
         self.animation.set_current(1 if not flip else 2)
+
+        self.create_dark_piece(False)
 
     def update(self) -> None:
         #If the stalks are moving at a certain pace, then increase the bobbing ticks.
         if STALK_SPEED > 1:
             self.tick += 0.16
+        else:
+            self.tick = 0
 
         #Handles the movement of the vines to be natural.
         inverse_tick = self.tick if self.origin_x > 300 else -self.tick
@@ -514,20 +763,31 @@ class head_dimple(flowey_piece):
         #Allows the owner (Flowey) to affect the x and y positioning of the organs.
         self.x = self.origin_x + self.owner.x + bobbing_x
         self.y = self.origin_y + self.owner.y + bobbing_y
-        self.get_sprite().resize_image_set(1 + (sin(self.tick * 0.5) * 2 / 100.0))
+        
+        if self.brightness >= 255:
+            self.get_sprite().resize_image_set(1 + (sin(self.tick * 0.5) * 2 / 100.0))
+        else:
+            self.get_sprite().resize_image_set(1.0)
+
+        if self.darkness != None:
+            self.darkness.update()
 
 #These are the eye-sockets which go to the outer rim of the lips.
 class eye_socket(flowey_piece):
     def __init__(self, owner: flowey, x: int, y: int, flip: bool) -> None:
-        super().__init__(owner, owner.sheets.EYE_SOCKET_ANIMATION_LEFT, owner.sheets.EYE_SOCKET_ANIMATION_RIGHT, x, y, flip, 256)
+        super().__init__(owner, owner.sheets.EYE_SOCKET_ANIMATION_LEFT, owner.sheets.EYE_SOCKET_ANIMATION_RIGHT, x, y, flip, 256, create_dark_piece_automatically = False)
 
-        self.get_sprite().resize_image(0.8)
+        self.get_sprite().resize_image_set_default(0.8)
+
+        self.create_dark_piece(False)
 
     def update(self) -> None:
         self.animation.update()
         #If the stalks are moving at a certain pace, then increase the bobbing ticks.
         if STALK_SPEED > 1:
             self.tick += 0.24
+        else:
+            self.tick = 0
 
         #Handles the movement of the vines to be natural.
         bobbing_y = sin(self.tick) * 2
@@ -536,18 +796,25 @@ class eye_socket(flowey_piece):
         self.x = self.origin_x + self.owner.x
         self.y = self.origin_y + self.owner.y + bobbing_y
 
+        if self.darkness != None:
+            self.darkness.update()
+
 #These are the eyes which go in the eye sockets.
 class eye(flowey_piece):
     def __init__(self, owner: flowey, x: int, y: int, flip: bool) -> None:
-        super().__init__(owner, owner.sheets.EYE_ANIMATION_LEFT, owner.sheets.EYE_ANIMATION_RIGHT, x, y, flip, 257)
+        super().__init__(owner, owner.sheets.EYE_ANIMATION_LEFT, owner.sheets.EYE_ANIMATION_RIGHT, x, y, flip, 257, create_dark_piece_automatically = False)
 
-        self.get_sprite().resize_image(0.75)
+        self.get_sprite().resize_image_set_default(0.75)
+
+        self.create_dark_piece(False)
 
     def update(self) -> None:
         self.animation.update()
         #If the stalks are moving at a certain pace, then increase the bobbing ticks.
         if STALK_SPEED > 1:
             self.tick += 0.2
+        else:
+            self.tick = 0
 
         #Handles the movement of the vines to be natural.
         bobbing_y = sin(self.tick) * 1.5
@@ -556,18 +823,25 @@ class eye(flowey_piece):
         self.x = self.origin_x + self.owner.x
         self.y = self.origin_y + self.owner.y + bobbing_y
 
+        if self.darkness != None:
+            self.darkness.update()
+
 #These are the pupils which go in the side eyes.
 class eye_pupil_small(flowey_piece):
     def __init__(self, owner: flowey, x: int, y: int, flip: bool) -> None:
-        super().__init__(owner, owner.sheets.PUPIL_ANIMATION, owner.sheets.PUPIL_ANIMATION, x, y, flip, 258, True, True)
+        super().__init__(owner, owner.sheets.PUPIL_ANIMATION, owner.sheets.PUPIL_ANIMATION, x, y, flip, 258, True, True, True, False)
 
-        self.get_sprite().resize_image(0.5)
+        self.get_sprite().resize_image_set_default(0.5)
+
+        self.create_dark_piece(True)
 
     def update(self) -> None:
         self.animation.update()
         #If the stalks are moving at a certain pace, then increase the bobbing ticks.
         if STALK_SPEED > 1:
             self.tick += 0.2
+        else:
+            self.tick = 0
 
         #Handles the movement of the vines to be natural.
         bobbing_y = sin(self.tick) * 1.6
@@ -575,7 +849,14 @@ class eye_pupil_small(flowey_piece):
         #Allows the owner (Flowey) to affect the x and y positioning of the organs.
         self.x = self.origin_x + self.owner.x
         self.y = self.origin_y + self.owner.y + bobbing_y
-        self.get_sprite().resize_image_set(0.5 + (sin(self.tick * 1.15) * 15 / 100.0))
+        
+        if self.brightness >= 255:
+            self.get_sprite().resize_image_set(1 + (sin(self.tick * 1.15) * 15 / 100.0))
+        else:
+            self.get_sprite().resize_image_set(1.0)
+
+        if self.darkness != None:
+            self.darkness.update()
 
 #These are the eyes which go to the left and right of the TV above the head.
 class eye_top(flowey_piece):
@@ -586,6 +867,8 @@ class eye_top(flowey_piece):
         #If the stalks are moving at a certain pace, then increase the bobbing ticks.
         if STALK_SPEED > 1:
             self.tick += 0.2
+        else:
+            self.tick = 0
 
         #Handles the movement of the vines to be natural.
         inverse_tick = -self.tick if self.origin_x > 300 else self.tick
@@ -596,18 +879,21 @@ class eye_top(flowey_piece):
         self.x = self.origin_x + self.owner.x + bobbing_x
         self.y = self.origin_y + self.owner.y + bobbing_y
 
+        if self.darkness != None:
+            self.darkness.update()
+
 #These are the pupils which go in the top eyes.
 class eye_pupil_large(flowey_piece):
     def __init__(self, owner: flowey, x: int, y: int, flip: bool) -> None:
         super().__init__(owner, owner.sheets.PUPIL_ANIMATION, owner.sheets.PUPIL_ANIMATION, x, y, flip, 260, True, True)
-
-        #self.get_sprite().resize_image(0.5)
 
     def update(self) -> None:
         self.animation.update()
         #If the stalks are moving at a certain pace, then increase the bobbing ticks.
         if STALK_SPEED > 1:
             self.tick += 0.2
+        else:
+            self.tick = 0
 
         #Handles the movement of the vines to be natural.
         inverse_tick = -self.tick if self.origin_x > 300 else self.tick
@@ -617,15 +903,24 @@ class eye_pupil_large(flowey_piece):
         #Allows the owner (Flowey) to affect the x and y positioning of the organs.
         self.x = self.origin_x + self.owner.x + bobbing_x
         self.y = self.origin_y + self.owner.y + bobbing_y
-        self.get_sprite().resize_image_set(1 + (sin(self.tick * 1.25) * 20 / 100.0))
+        
+        if self.brightness >= 255:
+            self.get_sprite().resize_image_set(1 + (sin(self.tick * 1.25) * 20 / 100.0))
+        else:
+            self.get_sprite().resize_image_set(1.0)
+
+        if self.darkness != None:
+            self.darkness.update()
 
 #These are the six circles of piping coming out of Flowey's face and TV.
 class piping(flowey_piece):
     def __init__(self, owner: flowey, x: int, y: int, index: int, direction: int, flip: bool) -> None:
-        super().__init__(owner, owner.sheets.PIPE_ANIMATION, None, x, y, flip, 249 - index, True, True)
+        super().__init__(owner, owner.sheets.PIPE_ANIMATION, None, x, y, flip, 249 - index, True, True, True, False)
 
         self.animation.set_current(int(direction / 2))
         self.animation = animation([self.get_sprite()], 0)
+
+        self.create_dark_piece(True, 0.5)
 
         self.my_delay = index * 4
         self.pause = 40
@@ -639,6 +934,8 @@ class piping(flowey_piece):
         #If the stalks are moving at a certain pace, then increase the bobbing ticks.
         if STALK_SPEED > 1:
             self.tick += 0.2
+        else:
+            self.tick = 0
 
         if self.delay_tick < self.my_delay:
             self.delay_tick += 1
@@ -657,7 +954,10 @@ class piping(flowey_piece):
                 self.size_velocity = 0
                 self.grow = False
 
-            self.get_sprite().resize_image_set(self.size)
+            if self.brightness >= 255:
+                self.get_sprite().resize_image_set(self.size)
+            else:
+                self.get_sprite().resize_image_set(0.5)
 
         #Handles the movement of the vines to be natural.
         bobbing_y = sin(self.tick / 2) * 4
@@ -665,3 +965,6 @@ class piping(flowey_piece):
         #Allows the owner (Flowey) to affect the x and y positioning of the organs.
         self.x = self.origin_x + self.owner.x
         self.y = self.origin_y + self.owner.y + bobbing_y
+
+        if self.darkness != None:
+            self.darkness.update()

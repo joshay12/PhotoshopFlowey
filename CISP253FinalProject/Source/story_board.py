@@ -6,7 +6,6 @@ from fonts import story
 from entity import entity, entity_collection
 from random import randint
 
-#TODO: Add all SOULs.
 #TODO: Begin the Photoshop Flowey fight.
 #TODO: Add attacks.
 #TODO: Add health bar.
@@ -38,7 +37,7 @@ class story_board:
         #Checks if the "Right" or "Left" button is currently held on the "Continue/Restart" screen.
         self.continue_or_restart_held = True
 
-    def begin(self, skip: int = 0) -> None:
+    def begin(self, effects: predef_effects, skip: int = 0) -> None:
         self.running = True
 
         if skip == 0:
@@ -54,6 +53,17 @@ class story_board:
             self.window.run_event(0, 3)
             self.entities.remove(self.entities.get_items_by_class(intro_picture).first())
             self.entities.remove(self.entities.get_items_by_class(save_star).first())
+        elif skip == 3:
+            self.pause_loop = True
+            self.window.run_event(0, 1)
+            self.window.run_event(0, 2)
+            self.window.run_event(0, 3)
+            self.entities.remove(self.entities.get_items_by_class(intro_picture).first())
+            self.entities.remove(self.entities.get_items_by_class(save_star).first())
+            
+            effects.EXPLOSION.stop()
+
+            self.window.run_event(3, 11)
 
     def update(self) -> None:
         self.entities.update()

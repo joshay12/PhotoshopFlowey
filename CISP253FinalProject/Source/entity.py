@@ -135,6 +135,9 @@ class entity_collection:
 
         return self.get(self.size() - 1)
 
+    def has_item_by_class(self, class_type: type) -> bool:
+        return self.get_items_by_class(class_type).size() > 0
+
     #Retrieves all entities with the class type provided.
     def get_items_by_class(self, class_type: type) -> 'entity_collection':
         output = entity_collection()
