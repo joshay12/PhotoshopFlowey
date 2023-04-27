@@ -117,6 +117,10 @@ class entity_collection:
     def remove_at(self, index: int) -> None:
         self.entities.remove(self.get(index))
 
+    def remove_range(self, entities: 'entity_collection') -> None:
+        for i in range(entities.size()):
+            self.remove(entities.get(i))
+
     #Retrieves the entity found at the index provided.
     def get(self, index: int) -> entity:
         return self.entities[index]

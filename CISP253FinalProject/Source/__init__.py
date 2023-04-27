@@ -1,7 +1,7 @@
 from input import keyboard
 from sprites import predef_spritesheets, SPRITESHEETS
 from entity import *
-from flowey import flowey
+from flowey import flowey, white_overlay, flowey_face, dark_piece
 from fonts import story, fonts_init
 from sound import predef_effects, predef_songs, EFFECTS, SONGS
 from story_board import story_board, intro_picture, file_backdrop, file_shattered, flowey_head, flowey_static
@@ -48,7 +48,7 @@ class window:
         self.entities.add(character(self, 640 / 2, 480 - 480 / 3, self.screen.get_width(), self.screen.get_height(), self.keyboard, SPRITESHEETS))
         self.entities.add(save_star(640 / 2, -350, self.entities, SPRITESHEETS))
         self.entities.get_items_by_class(character).first().set_save_star(self.entities).set_heal_effect(EFFECTS.HEAL)
-        self.flowey = flowey(self, SPRITESHEETS, 0, -475)
+        self.flowey = flowey(self, MY_SCREEN, SPRITESHEETS, 0, -475)
         self.board = story_board(story(SPRITESHEETS, EFFECTS, self.keyboard), self.entities, self)
 
         self.tick = 0
@@ -131,7 +131,7 @@ class window:
         pygame.display.flip()
 
     def run_event(self, story_number: int, event_number: int) -> None:
-        global SONGS, EFFECTS
+        global SONGS, EFFECTS, MY_SCREEN
 
         if story_number == 0:
             if event_number == 0:
@@ -315,7 +315,7 @@ class window:
 
                 self.entities.remove(f_head)
                 self.entities.remove(f_static)
-                self.entities.add(soul(skipped, self, p_char, self.keyboard, EFFECTS, SPRITESHEETS))
+                self.entities.add(soul(MY_SCREEN, skipped, self, p_char, self.keyboard, EFFECTS, SPRITESHEETS))
         elif story_number == 4:
             if event_number == 0:
                 self.entities.remove(self.entities.get_items_by_class(character).first())
@@ -358,7 +358,20 @@ class window:
             elif event_number == 4:
                 self.stop_red = True
                 self.begin_fight = False
+            elif event_number == 5:
+                SONGS.FLOWEY_MEGA_LAUGH.play(loops = 0)
 
+                MY_SCREEN.shake_screen_duration(3, 3, 385)
+        elif story_number == 5:
+            if event_number == 0:
+                SONGS.YOUR_BEST_NIGHTMARE_THEME1.play(loops = 0)
+
+                self.flowey.entities.remove(self.flowey.entities.get_items_by_class(white_overlay).first())
+                self.flowey.entities.remove(self.flowey.entities.get_items_by_class(flowey_face).first())
+
+                self.flowey.entities.remove_range(self.flowey.entities.get_items_by_class(dark_piece))
+
+                self.entities.get_items_by_class(soul).first().controls = True
 
 class my_screen:
     def __init__(self) -> None:
@@ -366,6 +379,7 @@ class my_screen:
         self.y = 0.0
         self.shake_intensity = 0.0
         self.shake_recovery = 0
+        self.duration = 0
         self.tick = 0
 
     def shake_screen(self, intensity: int, speed: int) -> None:
@@ -375,10 +389,18 @@ class my_screen:
         self.shake_recovery = speed
         self.tick = 0
 
+    def shake_screen_duration(self, intensity: int, speed: int, duration: int) -> None:
+        self.shake_screen(intensity, speed)
+        self.duration = int(duration / 3)
+
     def update(self) -> None:
         if self.shake_intensity >= 1.0:
             if self.tick >= 2:
-                self.shake_screen(int(self.shake_intensity / ((abs(self.shake_recovery) / 10) + 1)), self.shake_recovery)
+                if self.duration > 0:
+                    self.shake_screen(self.shake_intensity, self.shake_recovery)
+                    self.duration -= 1
+                else:
+                    self.shake_screen(int(self.shake_intensity / ((abs(self.shake_recovery) / 10) + 1)), self.shake_recovery)
             else:
                 self.tick += 1
         else:

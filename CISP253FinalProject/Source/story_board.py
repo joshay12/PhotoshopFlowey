@@ -6,7 +6,6 @@ from fonts import story
 from entity import entity, entity_collection
 from random import randint
 
-#TODO: Begin the Photoshop Flowey fight.
 #TODO: Add attacks.
 #TODO: Add health bar.
 #TODO: Add game over.

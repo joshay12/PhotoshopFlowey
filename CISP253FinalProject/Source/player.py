@@ -186,9 +186,10 @@ class character(entity):
         screen.blit(self.get_sprite().image, self.get_data())
 
 class soul(entity):
-    def __init__(self, skipped: bool, window, owner: character, keyboard: keyboard, effects: predef_effects, spritesheets: predef_spritesheets) -> None:
+    def __init__(self, my_screen, skipped: bool, window, owner: character, keyboard: keyboard, effects: predef_effects, spritesheets: predef_spritesheets) -> None:
         super().__init__(spritesheets.PLAYER_SOUL_ANIMATION, owner.x, owner.y, True, False)
 
+        self.my_screen = my_screen
         self.window = window
         self.owner = owner
         self.keyboard = keyboard
@@ -200,7 +201,7 @@ class soul(entity):
         self.origin_x = self.x
         self.origin_y = self.y
 
-        self.speed = 4
+        self.speed = 3
         self.tick = 0 if not skipped else -60
         self.controls = False
         self.prepare = True
@@ -241,8 +242,8 @@ class soul(entity):
                         self.window.run_event(4, 1)
                         self.prepare = False
 
-                self.x = self.origin_x
-                self.y = self.origin_y
+            self.x = self.origin_x + self.my_screen.x
+            self.y = self.origin_y + self.my_screen.y
 
             return
 
@@ -261,6 +262,19 @@ class soul(entity):
 
         self.origin_x += x
         self.origin_y += y
+
+        if self.origin_x < 640 / 2 - 200 - self.width:
+            self.origin_x = 640 / 2 - 200 - self.width
+        elif self.origin_x > 640 / 2 + 200:
+            self.origin_x = 640 / 2 + 200
+
+        if self.origin_y < 480 / 2 + 20:
+            self.origin_y = 480 / 2 + 20
+        elif self.origin_y > 480 - self.height:
+            self.origin_y = 480 - self.height
+
+        self.x = self.origin_x + self.my_screen.x
+        self.y = self.origin_y + self.my_screen.y
 
     def render(self, screen: Surface) -> None:
         screen.blit(self.get_sprite().image, self.get_data())

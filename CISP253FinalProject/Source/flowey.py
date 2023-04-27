@@ -6,17 +6,21 @@ STALK_SPEED = 3
 ORGAN_SIZE_OFFSET = 1.0
 
 class flowey:
-    def __init__(self, window, sheets: predef_spritesheets, x: int, y: int) -> None:
+    def __init__(self, window, my_screen, sheets: predef_spritesheets, x: int, y: int) -> None:
         global ORGAN_SIZE_OFFSET
 
         self.window = window
-        self.x = x;
-        self.y = y;
+        self.my_screen = my_screen
+        self.x = x
+        self.y = y
+        self.origin_x = x
+        self.origin_y = y
         self.brightness = 0
         self.sheets = sheets
         self.visible = False
         self.move_to_0 = False
         self.reveal_flowey = False
+        self.laugh = 0
 
         self.entities = entity_collection()
 
@@ -172,31 +176,44 @@ class flowey:
             entity.readjust_size()
 
     def update(self) -> None:
+        global STALK_SPEED
+
         for entity in self.entities.entities:
             entity.update()
 
         self.tick += 1
 
-        if self.move_to_0 and self.y < 0:
-            self.y += 0.6
+        if self.move_to_0 and self.origin_y < 0:
+            self.origin_y += 0.6
 
-            if self.y > 0:
-                self.y = 0
+            if self.origin_y > 0:
+                self.origin_y = 0
                 self.move_to_0 = False
 
-        if self.tick == 960 and self.y == 0 and not self.reveal_flowey:
+        if self.tick == 960 and self.origin_y == 0 and not self.reveal_flowey:
             self.entities.add(white_overlay(self.entities.get_items_by_class(television).first(), self.sheets))
-        elif self.reveal_flowey and self.brightness < 255:
-            global STALK_SPEED
-
+        elif self.reveal_flowey and self.brightness < 255 and self.laugh == 0:
             STALK_SPEED = 1
 
             self.brightness += 20
 
             if self.brightness > 255:
                 self.brightness = 255
+                self.laugh = 1
+                self.tick = 0
 
             self.set_brightness_all()
+        elif self.laugh == 1 and self.tick == 60:
+            self.laugh = 2
+            self.window.run_event(4, 5)
+        elif self.laugh == 2 and self.tick == 450:
+            self.laugh = 3
+        elif self.laugh == 3 and self.tick == 510:
+            self.window.run_event(5, 0)
+            STALK_SPEED = 3
+
+        self.x = self.origin_x + self.my_screen.x
+        self.y = self.origin_y + self.my_screen.y
 
     def render(self, screen: Surface) -> None:
         if not self.visible:
@@ -268,30 +285,41 @@ class flowey_face(entity):
 
         n_height = self.get_sprite().get_height()
 
-        self.y_offset -= int((n_height - c_height) / 2)
+        self.y_offset -= int((n_height - c_height) / 2) if self.animation.index < 11 else 0
 
         self.opacity = self.overlay.opacity
         self.x = self.overlay.x + self.overlay.width / 2 - self.width / 2
         self.y = self.overlay.y + self.overlay.height / 2 - 32 - self.y_offset
         self.get_sprite().change_opacity(self.opacity)
 
-        if self.opacity >= 255:
-            if self.animation.index < 6:
-                self.animation.increment = 5
-            elif self.animation.index == 6 and self.tick < 60:
-                self.animation.increment = 0
-                self.tick += 1
-            elif self.animation.index == 6:
-                self.animation.next()
-                self.animation.increment = 5
-                self.tick = 0
-            elif self.animation.index == 10 and self.tick < 60:
-                self.animation.increment = 0
-                self.tick += 1
-            elif self.animation.index == 10 and self.tick == 60:
-                self.overlay.tv.owner.reveal_flowey = True
-                self.overlay.tv.owner.window.run_event(4, 4)
-                self.tick += 1
+        if self.overlay.tv.owner.laugh < 2:
+            if self.opacity >= 255:
+                if self.animation.index < 6:
+                    self.animation.increment = 5
+                elif self.animation.index == 6 and self.tick < 60:
+                    self.animation.increment = 0
+                    self.tick += 1
+                elif self.animation.index == 6:
+                    self.animation.next()
+                    self.animation.increment = 5
+                    self.tick = 0
+                elif self.animation.index == 10 and self.tick < 60:
+                    self.animation.increment = 0
+                    self.tick += 1
+                elif self.animation.index == 10 and self.tick == 60:
+                    self.overlay.tv.owner.reveal_flowey = True
+                    self.overlay.tv.owner.window.run_event(4, 4)
+                    self.tick += 1
+        elif self.overlay.tv.owner.laugh == 2:
+            self.y_offset = -22
+            self.animation.increment = 4
+
+            if self.animation.index > 13:
+                self.animation.set_current(11)
+        else:
+            self.y_offset = -14
+            self.animation.increment = 0
+            self.animation.set_current(14)
 
     def render(self, screen: Surface) -> None:
         if not self.visible:
