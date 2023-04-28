@@ -1,6 +1,7 @@
 from PIL import Image, ImageEnhance
 import pygame
 
+#This helps the init py file to retrieved pre-loaded spritesheets and animations.
 SPRITESHEETS = None
 
 #A spritesheet class dedicated to handling more than one image and spliting them up amongst sprites.
@@ -109,12 +110,14 @@ class sprite:
     def flip_both(self) -> 'sprite':
         return sprite([pygame.transform.flip(self.image, True, True)])
 
+    #Resizes the image according to the current image.
     def resize_image(self, percent: float) -> None:
         width = self.image.get_width()
         height = self.image.get_height()
 
         self.image = pygame.transform.scale(self.image, (width * percent, height * percent))
 
+    #Resizes the image according to the original image.
     def resize_image_set(self, percent: float) -> None:
         width = self.origin_image.get_width()
         height = self.origin_image.get_height()
@@ -122,6 +125,7 @@ class sprite:
         self.image = pygame.transform.smoothscale(self.origin_image, (width * percent, height * percent))
         self.size = percent
 
+    #Resizes the image according to the original image and resets the original image to a copy of the image.
     def resize_image_set_default(self, percent: float) -> None:
         width = self.origin_image.get_width()
         height = self.origin_image.get_height()
@@ -131,6 +135,7 @@ class sprite:
         self.origin_image_string = pygame.image.tostring(self.origin_image, "RGBA")
         self.size = percent
 
+    #Turn the image into complete darkness.
     def make_silhouette(self) -> None:
         image = Image.frombuffer("RGBA", self.origin_image.get_size(), self.origin_image_string, "raw", "RGBA", 0, 1)
         enhancer = ImageEnhance.Brightness(image)
@@ -140,6 +145,7 @@ class sprite:
         self.origin_image = self.image.copy()
         self.origin_image_string = pygame.image.tostring(self.origin_image, "RGBA")
 
+    #Change the brightness of the image.
     def set_brightness(self, brightness: float) -> None:
         image = Image.frombuffer("RGBA", self.origin_image.get_size(), self.origin_image_string, "raw", "RGBA", 0, 1)
         enhancer = ImageEnhance.Brightness(image)
@@ -147,6 +153,7 @@ class sprite:
 
         self.image = pygame.image.fromstring(new_image.tobytes(), new_image.size, new_image.mode)
 
+    #Change the transparency of the image.
     def change_opacity(self, opacity: int) -> None:
         self.image = self.origin_image.copy()
 
@@ -192,8 +199,9 @@ class animation:
                 #If the amount of images to skip in the animation is more or less than 1, then proceed to skip frames of the animation.
                 self.change_animation(self.amount_to_skip)
 
+    #Removes all sprites from the animation except for the index provided.
+    #Using this, optimizes non-animated entities of whom have a copied animation of unnecessary sprites.
     def clear_all_but(self, index: int) -> 'animation':
-        #return self
         return animation([self.sprites[index - 1]], self.increment)
 
     #Flips all sprites in the animation horizontally.
@@ -223,14 +231,17 @@ class animation:
 
         return animation(sprites, self.increment)
 
+    #Make all sprites within the animation silhouetted (completely black).
     def make_silhouette(self) -> None:
         for sprite in self.sprites:
             sprite.make_silhouette()
 
+    #Change the brightness for all sprites in the animation.
     def set_brightness(self, brightness: float) -> None:
         for sprite in self.sprites:
             sprite.set_brightness(brightness)
 
+    #Change the transparency for all sprites in the animation.
     def change_opacity_all(self, opacity: int) -> None:
         for sprite in self.sprites:
             sprite.change_opacity(opacity)
@@ -281,12 +292,13 @@ class animation:
 
         return sprite([self.sprites[index].image])
 
+    #Resize the image of the sprite found at the index provided and set it to default to the percent provided.
     def resize_image_set_default(self, index: int, percent: float) -> 'sprite':
         self.sprites[index].resize_image_set_default(percent)
 
         return sprite([self.sprites[index].image])
 
-    #Resize an entire animation according to the tuple provided for size.
+    #Resize an entire animation according to the percent provided.
     def resize_images(self, percent: float) -> 'animation':
         sprites = []
 
@@ -295,6 +307,7 @@ class animation:
 
         return animation(sprites, self.increment)
 
+    #Resize an entire animation according to the percent provided and set that percentage to be the default for each sprite in the information.
     def resize_images_set_defaults(self, percent: float) -> 'animation':
         sprites = []
 
@@ -303,6 +316,7 @@ class animation:
 
         return animation(sprites, self.increment)
 
+    #So an in-depth copy of the animation for each sprite and image within the sprite.
     def copy(self) -> 'animation':
         sprites = []
 
@@ -311,6 +325,7 @@ class animation:
 
         return animation(sprites, self.increment)
 
+#This is a pre-loaded class with spritesheets and animations loaded on it.
 class predef_spritesheets:
     def __init__(self, screen: pygame.Surface) -> None:
         #Introduction Screen Animation

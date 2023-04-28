@@ -3,8 +3,11 @@ from pygame import Rect, Surface
 from abc import abstractmethod
 from math import sqrt
 
+#This is the screen in our init py file which handles the in-game screen shaking.
 MY_SCREEN = None
 
+#Here, we initialize all entities with a global MY_SCREEN variable.
+#This is done because if we import MY_SCREEN from the init py file, we get a circular import which crashes the game.
 class entity_init:
     def __init__(self, my_screen) -> None:
         global MY_SCREEN
@@ -94,7 +97,7 @@ class entity_collection:
         self.entities.append(entity)
         self.sort()
 
-    #Add a list of entities to the current list.
+    #Add a list of entities to the current list and sort it by the entity's layer.
     def add_range(self, entities: list) -> None:
         for entity in entities:
             self.entities.append(entity)
@@ -117,6 +120,7 @@ class entity_collection:
     def remove_at(self, index: int) -> None:
         self.entities.remove(self.get(index))
 
+    #Removes a collection of entities from this entity collection.
     def remove_range(self, entities: 'entity_collection') -> None:
         for i in range(entities.size()):
             self.remove(entities.get(i))
@@ -139,6 +143,7 @@ class entity_collection:
 
         return self.get(self.size() - 1)
 
+    #Checks if the entity collection has a specific type of entity within it.
     def has_item_by_class(self, class_type: type) -> bool:
         return self.get_items_by_class(class_type).size() > 0
 
@@ -164,6 +169,7 @@ class entity_collection:
     def size(self) -> int:
         return len(self.entities)
 
+    #Sorts all items in the collection by the layer.
     def sort(self) -> None:
         self.entities.sort(key = lambda x: x.layer, reverse = False)
 
